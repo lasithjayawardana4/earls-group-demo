@@ -1,0 +1,376 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  Compass,
+  Star,
+  Maximize2,
+  Bed,
+  Users2,
+  Check,
+  ChevronRight,
+  X,
+  Award,
+  ChevronDown
+} from "lucide-react";
+import BookingWidget from "./BookingWidget";
+import { motion, AnimatePresence } from "framer-motion";
+
+interface HotelDetailCoordinatorProps {
+  hotel: any;
+  rooms: any[];
+  relatedHotels: any[];
+}
+
+export default function HotelDetailCoordinator({
+  hotel,
+  rooms,
+  relatedHotels,
+}: HotelDetailCoordinatorProps) {
+  const [selectedRoomSlug, setSelectedRoomSlug] = useState(rooms[0]?.slug || "deluxe-room");
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [openFAQIndex, setOpenFAQIndex] = useState<number | null>(null);
+
+  // Scroll to booking widget
+  const handleReserveRoom = (roomSlug: string) => {
+    setSelectedRoomSlug(roomSlug);
+    const widget = document.getElementById("booking-card");
+    if (widget) {
+      widget.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 relative">
+      {/* Left Column: Hotel Info & Rooms */}
+      <div className="lg:col-span-2 space-y-20">
+        {/* Description */}
+        <section id="about" className="space-y-6">
+          <h3 className="font-serif text-3xl text-luxury-ivory tracking-wide">
+            The Sanctuary Overview
+          </h3>
+          <p className="text-base text-luxury-ivory/70 font-light leading-relaxed">
+            {hotel.longDescription}
+          </p>
+        </section>
+
+        {/* Room Types Listing */}
+        <section id="rooms" className="space-y-10">
+          <div className="border-b border-luxury-gold/15 pb-4">
+            <h3 className="font-serif text-3xl text-luxury-ivory tracking-wide">
+              Suites &amp; Villas
+            </h3>
+            <p className="text-xs text-luxury-gold tracking-widest uppercase mt-1">
+              Select your private living quarters
+            </p>
+          </div>
+
+          <div className="space-y-12">
+            {rooms.map((room) => (
+              <div
+                key={room.slug}
+                className="group border border-luxury-gold/10 bg-luxury-charcoal/20 flex flex-col md:flex-row overflow-hidden hover:border-luxury-gold/30 transition-all duration-500"
+              >
+                {/* Room Image */}
+                <div className="relative w-full md:w-80 h-64 md:h-auto overflow-hidden">
+                  <Image
+                    src={room.images[0] || hotel.images[0]}
+                    alt={room.name}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-700 filter brightness-95"
+                  />
+                </div>
+
+                {/* Room Specs */}
+                <div className="p-8 flex-grow flex flex-col justify-between">
+                  <div>
+                    <div className="flex justify-between items-start mb-2 gap-4">
+                      <h4 className="font-serif text-2xl text-luxury-ivory group-hover:text-luxury-gold transition-colors duration-300">
+                        {room.name}
+                      </h4>
+                      <div className="text-right" />
+                    </div>
+
+                    <p className="text-xs text-luxury-ivory/60 font-light leading-relaxed mb-6">
+                      {room.description}
+                    </p>
+
+                    {/* Room Stats */}
+                    <div className="grid grid-cols-3 gap-4 border-y border-luxury-gold/5 py-3 mb-6 text-xs text-luxury-ivory/50">
+                      <div className="flex items-center space-x-2">
+                        <Maximize2 size={14} className="text-luxury-gold/60" />
+                        <span>{room.size}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Bed size={14} className="text-luxury-gold/60" />
+                        <span>{room.bedType}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Users2 size={14} className="text-luxury-gold/60" />
+                        <span>Max {room.occupancy.adults} Guests</span>
+                      </div>
+                    </div>
+
+                    {/* Amenities list */}
+                    <div className="grid grid-cols-2 gap-2 text-xs text-luxury-ivory/55 mb-6">
+                      {room.amenities.slice(0, 4).map((amen: string) => (
+                        <div key={amen} className="flex items-center space-x-2">
+                          <Check size={12} className="text-luxury-gold" />
+                          <span>{amen}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleReserveRoom(room.slug)}
+                    className="btn-gold w-full md:w-fit px-8 py-3 text-center text-xs tracking-widest font-sans"
+                  >
+                    SELECT &amp; BOOK
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Facilities Section */}
+        <section id="facilities" className="space-y-8">
+          <div className="border-b border-luxury-gold/15 pb-4">
+            <h3 className="font-serif text-3xl text-luxury-ivory tracking-wide">
+              Bespoke Facilities
+            </h3>
+            <p className="text-xs text-luxury-gold tracking-widest uppercase mt-1">
+              Curated guest facilities &amp; experiences
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+            {hotel.facilities.map((fac: string) => (
+              <div
+                key={fac}
+                className="p-6 border border-luxury-gold/5 bg-luxury-charcoal/10 hover:border-luxury-gold/15 transition-all duration-300 flex flex-col items-center text-center space-y-3"
+              >
+                <div className="w-10 h-10 rounded-full border border-luxury-gold/20 flex items-center justify-center text-luxury-gold">
+                  <Compass size={18} />
+                </div>
+                <span className="font-serif text-base text-luxury-ivory">{fac}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Gallery Section */}
+        <section id="gallery" className="space-y-8">
+          <div className="border-b border-luxury-gold/15 pb-4">
+            <h3 className="font-serif text-3xl text-luxury-ivory tracking-wide">
+              Visual Narrative
+            </h3>
+            <p className="text-xs text-luxury-gold tracking-widest uppercase mt-1">
+              Immerse yourself in our captures
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {hotel.images.map((img: string, idx: number) => (
+              <div
+                key={idx}
+                onClick={() => setLightboxImage(img)}
+                className="relative h-44 overflow-hidden border border-luxury-gold/10 cursor-pointer group"
+              >
+                <Image
+                  src={img}
+                  alt={`Gallery image ${idx + 1}`}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-700 filter brightness-95 group-hover:brightness-100"
+                />
+                <div className="absolute inset-0 bg-luxury-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-300">
+                  <span className="text-[0.6rem] text-luxury-gold tracking-widest uppercase border border-luxury-gold/30 px-3 py-1 font-semibold">
+                    Enlarge View
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Attractions */}
+        <section id="attractions" className="space-y-8">
+          <div className="border-b border-luxury-gold/15 pb-4">
+            <h3 className="font-serif text-3xl text-luxury-ivory tracking-wide">
+              Local Heritage &amp; Journeys
+            </h3>
+            <p className="text-xs text-luxury-gold tracking-widest uppercase mt-1">
+              Nearby exploration curated by concierge
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {hotel.nearbyAttractions.map((attr: any) => (
+              <div
+                key={attr.name}
+                className="p-6 border border-luxury-gold/10 bg-luxury-charcoal/20 flex flex-col justify-between space-y-4"
+              >
+                <div>
+                  <div className="flex justify-between items-start gap-4 mb-2">
+                    <h4 className="font-serif text-xl text-luxury-gold">{attr.name}</h4>
+                    <span className="text-[0.65rem] text-luxury-ivory/40 uppercase tracking-widest font-mono bg-luxury-black border border-luxury-gold/5 px-2.5 py-1">
+                      {attr.distance} away
+                    </span>
+                  </div>
+                  <p className="text-xs text-luxury-ivory/60 leading-relaxed font-light">
+                    {attr.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Reviews Section */}
+        <section id="reviews" className="space-y-8">
+          <div className="border-b border-luxury-gold/15 pb-4">
+            <h3 className="font-serif text-3xl text-luxury-ivory tracking-wide">
+              Guest Impressions
+            </h3>
+            <p className="text-xs text-luxury-gold tracking-widest uppercase mt-1">
+              Testimonials from our valued guests
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            {hotel.reviews.map((rev: any, idx: number) => (
+              <div key={idx} className="p-6 border border-luxury-gold/5 bg-luxury-charcoal/10 relative">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-xs font-semibold text-luxury-gold uppercase tracking-wider">
+                    {rev.author}
+                  </span>
+                  <div className="flex items-center space-x-1">
+                    {[...Array(rev.rating)].map((_, i) => (
+                      <Star key={i} size={10} className="text-luxury-gold fill-luxury-gold" />
+                    ))}
+                  </div>
+                </div>
+                <p className="font-serif text-base text-luxury-ivory/70 italic leading-relaxed font-light mb-2">
+                  &ldquo;{rev.comment}&rdquo;
+                </p>
+                <span className="text-[0.65rem] text-luxury-ivory/40 block text-right">
+                  {rev.date}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section id="faqs" className="space-y-8">
+          <div className="border-b border-luxury-gold/15 pb-4">
+            <h3 className="font-serif text-3xl text-luxury-ivory tracking-wide">
+              Familiar Questions
+            </h3>
+            <p className="text-xs text-luxury-gold tracking-widest uppercase mt-1">
+              General queries regarding your stay
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {hotel.faqs.map((faq: any, idx: number) => (
+              <div
+                key={idx}
+                className="border border-luxury-gold/10 bg-luxury-charcoal/15 overflow-hidden"
+              >
+                <button
+                  onClick={() => setOpenFAQIndex(openFAQIndex === idx ? null : idx)}
+                  className="w-full p-5 flex items-center justify-between text-left focus:outline-none"
+                >
+                  <span className="font-serif text-lg text-luxury-ivory pr-6">
+                    {faq.question}
+                  </span>
+                  <ChevronDown
+                    size={16}
+                    className={`text-luxury-gold transition-transform duration-300 ${
+                      openFAQIndex === idx ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                <AnimatePresence>
+                  {openFAQIndex === idx && (
+                    <motion.div
+                      initial={{ height: 0 }}
+                      animate={{ height: "auto" }}
+                      exit={{ height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <p className="p-5 pt-0 text-xs text-luxury-ivory/60 leading-relaxed font-light border-t border-luxury-gold/5">
+                        {faq.answer}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Policies Section */}
+        <section id="policies" className="space-y-6">
+          <h3 className="font-serif text-2xl text-luxury-ivory tracking-wide">
+            Policies &amp; Disclaimers
+          </h3>
+          <ul className="space-y-2.5 text-xs text-luxury-ivory/60 font-light">
+            {hotel.policies.map((p: string, idx: number) => (
+              <li key={idx} className="flex items-start space-x-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-luxury-gold mt-1.5 flex-shrink-0" />
+                <span>{p}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+
+      {/* Right Column: Sticky Booking Widget */}
+      <div className="lg:col-span-1">
+        <div id="booking-card" className="lg:sticky lg:top-28">
+          <BookingWidget
+            hotel={hotel}
+            rooms={rooms}
+            selectedRoomSlug={selectedRoomSlug}
+            onSelectRoomSlug={(slug) => setSelectedRoomSlug(slug)}
+          />
+        </div>
+      </div>
+
+      {/* Lightbox Modal */}
+      <AnimatePresence>
+        {lightboxImage && (
+          <motion.div
+            className="fixed inset-0 z-[9999] bg-black/95 flex items-center justify-center p-4 cursor-zoom-out"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setLightboxImage(null)}
+          >
+            <button
+              onClick={() => setLightboxImage(null)}
+              className="absolute top-6 right-6 text-luxury-ivory hover:text-luxury-gold transition-colors focus:outline-none"
+              aria-label="Close Lightbox"
+            >
+              <X size={28} />
+            </button>
+            <div className="relative max-w-5xl max-h-[85vh] w-full h-full">
+              <Image
+                src={lightboxImage}
+                alt="Enlarged gallery capture"
+                fill
+                className="object-contain"
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
