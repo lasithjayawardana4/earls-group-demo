@@ -11,6 +11,7 @@ export interface IRoom extends Document {
   price: number;
   amenities: string[];
   images: string[];
+  video?: string;
 }
 
 const RoomSchema: Schema = new Schema(
@@ -28,6 +29,7 @@ const RoomSchema: Schema = new Schema(
     price: { type: Number, required: true },
     amenities: [{ type: String }],
     images: [{ type: String }],
+    video: { type: String },
   },
   { timestamps: true }
 );

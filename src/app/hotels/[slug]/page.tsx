@@ -3,6 +3,7 @@ import { getHotelBySlug, getRoomsForHotel, getHotels } from "@/lib/data";
 import HotelDetailCoordinator from "@/components/HotelDetailCoordinator";
 import Image from "next/image";
 import { Star, MapPin } from "lucide-react";
+import { Suspense } from "react";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -74,7 +75,9 @@ export default async function HotelDetailPage({ params }: Props) {
 
       {/* Main Content Area */}
       <section className="max-w-7xl mx-auto px-6 pt-16">
-        <HotelDetailCoordinator hotel={hotel} rooms={rooms} relatedHotels={relatedHotels} />
+        <Suspense fallback={<div className="text-luxury-gold text-center py-12">Loading sanctuary details...</div>}>
+          <HotelDetailCoordinator hotel={hotel} rooms={rooms} relatedHotels={relatedHotels} />
+        </Suspense>
       </section>
     </div>
   );

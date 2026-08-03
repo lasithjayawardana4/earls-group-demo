@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   Compass,
   Star,
@@ -32,6 +33,24 @@ export default function HotelDetailCoordinator({
   const [selectedRoomSlug, setSelectedRoomSlug] = useState(rooms[0]?.slug || "deluxe-room");
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const [openFAQIndex, setOpenFAQIndex] = useState<number | null>(null);
+
+  const searchParams = useSearchParams();
+  const roomParam = searchParams.get("room");
+
+  useEffect(() => {
+    if (roomParam && rooms.some((r) => r.slug === roomParam)) {
+      setSelectedRoomSlug(roomParam);
+      const hash = window.location.hash;
+      if (hash === "#booking-card") {
+        setTimeout(() => {
+          const widget = document.getElementById("booking-card");
+          if (widget) {
+            widget.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }, 300);
+      }
+    }
+  }, [roomParam, rooms]);
 
   // Scroll to booking widget
   const handleReserveRoom = (roomSlug: string) => {
@@ -124,12 +143,20 @@ export default function HotelDetailCoordinator({
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => handleReserveRoom(room.slug)}
-                    className="btn-gold w-full md:w-fit px-8 py-3 text-center text-xs tracking-widest font-sans"
-                  >
-                    SELECT &amp; BOOK
-                  </button>
+                  <div className="flex flex-col space-y-3 w-full md:w-fit">
+                    <Link
+                      href={`/hotels/${hotel.slug}/rooms/${room.slug}`}
+                      className="btn-outline-gold w-full px-8 py-3 text-center text-xs tracking-widest font-sans uppercase block"
+                    >
+                      EXPLORE ROOM
+                    </Link>
+                    <button
+                      onClick={() => handleReserveRoom(room.slug)}
+                      className="btn-gold w-full px-8 py-3 text-center text-xs tracking-widest font-sans"
+                    >
+                      SELECT &amp; BOOK
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

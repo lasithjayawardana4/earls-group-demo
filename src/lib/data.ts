@@ -252,3 +252,28 @@ export async function getGallery() {
   }
   return MOCK_GALLERY;
 }
+
+export async function getRoomBySlug(hotelSlug: string, roomSlug: string) {
+  try {
+    await dbConnect();
+    const hotel = await Hotel.findOne({ slug: hotelSlug }).lean();
+    if (hotel) {
+      const room = await Room.findOne({ hotel: hotel._id, slug: roomSlug }).lean();
+      if (room) {
+        return JSON.parse(JSON.stringify({ ...room, hotel }));
+      }
+    }
+  } catch (err) {
+    console.warn(`MongoDB query failed for room ${roomSlug} under hotel ${hotelSlug}, using mock.`);
+  }
+
+  // Fallback to mock
+  const matchingHotel = MOCK_HOTELS.find((h) => h.slug === hotelSlug);
+  if (matchingHotel) {
+    const room = MOCK_ROOMS.find((r) => r.hotel === matchingHotel._id && r.slug === roomSlug);
+    if (room) {
+      return { ...room, hotel: matchingHotel };
+    }
+  }
+  return null;
+}
