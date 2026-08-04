@@ -123,7 +123,7 @@ export default function BookingWidget({
   }
 
   return (
-    <div className="glass-panel p-6 sticky top-28 z-20">
+    <div className="glass-panel p-6 lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto z-20">
       <h3 className="font-serif text-2xl text-luxury-ivory mb-2">Reserve Your Sanctuary</h3>
       <p className="text-xs text-luxury-gold/75 tracking-wider uppercase mb-6">
         Earls Group Best Rate Guarantee

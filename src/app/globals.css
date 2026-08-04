@@ -1,15 +1,59 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --luxury-black: #FCFAF7;
+  --luxury-gold: #9E7428;
+  --luxury-gold-dark: #7C5718;
+  --luxury-gold-light: #C09B53;
+  --luxury-ivory: #1C1814;
+  --luxury-charcoal: #F4EFEA;
+  --luxury-silver: #5C5852;
+  --luxury-glass: rgba(252, 250, 247, 0.75);
+  --luxury-glass-border: rgba(158, 116, 40, 0.15);
+  
+  --glass-panel-bg: rgba(243, 239, 233, 0.75);
+  --glass-panel-border: rgba(158, 116, 40, 0.18);
+  --glass-panel-light-bg: rgba(28, 24, 20, 0.04);
+  --glass-panel-light-border: rgba(28, 24, 20, 0.08);
+  --gold-gradient-start: #1C1814;
+  
+  --background: var(--luxury-black);
+  --foreground: var(--luxury-ivory);
+}
+
+.dark {
+  --luxury-black: #12100E;
+  --luxury-gold: #D4AF37;
+  --luxury-gold-dark: #9E7428;
+  --luxury-gold-light: #F3E5AB;
+  --luxury-ivory: #FCFAF7;
+  --luxury-charcoal: #1C1814;
+  --luxury-silver: #A39E96;
+  --luxury-glass: rgba(18, 16, 14, 0.75);
+  --luxury-glass-border: rgba(212, 175, 55, 0.25);
+  
+  --glass-panel-bg: rgba(28, 24, 20, 0.75);
+  --glass-panel-border: rgba(212, 175, 55, 0.25);
+  --glass-panel-light-bg: rgba(252, 250, 247, 0.04);
+  --glass-panel-light-border: rgba(252, 250, 247, 0.08);
+  --gold-gradient-start: #FCFAF7;
+  
+  --background: var(--luxury-black);
+  --foreground: var(--luxury-ivory);
+}
+
 @theme {
-  --color-luxury-black: #FCFAF7;
-  --color-luxury-gold: #9E7428;
-  --color-luxury-gold-dark: #7C5718;
-  --color-luxury-gold-light: #C09B53;
-  --color-luxury-ivory: #1C1814;
-  --color-luxury-charcoal: #F4EFEA;
-  --color-luxury-silver: #5C5852;
-  --color-luxury-glass: rgba(252, 250, 247, 0.75);
-  --color-luxury-glass-border: rgba(158, 116, 40, 0.15);
+  --color-luxury-black: var(--luxury-black);
+  --color-luxury-gold: var(--luxury-gold);
+  --color-luxury-gold-dark: var(--luxury-gold-dark);
+  --color-luxury-gold-light: var(--luxury-gold-light);
+  --color-luxury-ivory: var(--luxury-ivory);
+  --color-luxury-charcoal: var(--luxury-charcoal);
+  --color-luxury-silver: var(--luxury-silver);
+  --color-luxury-glass: var(--luxury-glass);
+  --color-luxury-glass-border: var(--luxury-glass-border);
   
   --font-serif: var(--font-cormorant), "Playfair Display", serif;
   --font-sans: var(--font-inter), sans-serif;
@@ -35,8 +79,8 @@
 }
 
 :root {
-  --background: #FCFAF7;
-  --foreground: #1C1814;
+  --background: var(--luxury-black);
+  --foreground: var(--luxury-ivory);
 }
 
 body {
@@ -89,27 +133,27 @@ html.lenis, html.lenis body {
 
 /* Premium Utilities */
 .glass-panel {
-  background: rgba(243, 239, 233, 0.75);
+  background: var(--glass-panel-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(158, 116, 40, 0.18);
+  border: 1px solid var(--glass-panel-border);
 }
 
 .glass-panel-light {
-  background: rgba(28, 24, 20, 0.04);
+  background: var(--glass-panel-light-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(28, 24, 20, 0.08);
+  border: 1px solid var(--glass-panel-light-border);
 }
 
 .text-gold-gradient {
-  background: linear-gradient(135deg, #1C1814 0%, #9E7428 50%, #7C5718 100%);
+  background: linear-gradient(135deg, var(--gold-gradient-start) 0%, #9E7428 50%, #7C5718 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gold-gradient-light {
-  background: linear-gradient(135deg, #FCFAF7 0%, #C09B53 50%, #9E7428 100%);
+  background: linear-gradient(135deg, var(--luxury-black) 0%, #C09B53 50%, #9E7428 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

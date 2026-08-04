@@ -116,7 +116,7 @@ export default async function Home() {
             className="w-full h-full object-cover"
           >
             <source
-              src="https://res.cloudinary.com/dnj5bft7g/video/upload/v1785816402/12834077_3840_2160_24fps_pjaxtq.mp4"
+              src="https://res.cloudinary.com/dnj5bft7g/video/upload/v1785854256/12834077_3840_2160_24fps_1_dbssqu.mp4"
               type="video/mp4"
             />
           </video>

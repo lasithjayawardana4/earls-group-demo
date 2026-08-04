@@ -34,7 +34,7 @@ export const MOCK_HOTELS = [
     policies: ["Check-in from 2:00 PM, Check-out by 12:00 PM", "Respectful attire is recommended for nearby cultural visits"],
     mapCoordinates: { lat: 7.2941, lng: 80.6698 },
     featured: true,
-    heroVideo: "https://res.cloudinary.com/dnj5bft7g/video/upload/v1785814550/13263196_2160_3840_50fps_zwogpk.mp4",
+    heroVideo: "https://res.cloudinary.com/dnj5bft7g/video/upload/v1785858638/13263196_2160_3840_50fps_1_ijqdhg.mp4",
   },
   {
     _id: "65d3ec62b083c659d81d6432",
@@ -65,7 +65,7 @@ export const MOCK_HOTELS = [
     policies: ["Check-in from 2:00 PM, Check-out by 12:00 PM"],
     mapCoordinates: { lat: 7.2798, lng: 80.6285 },
     featured: true,
-    heroVideo: "https://res.cloudinary.com/dnj5bft7g/video/upload/v1785814407/12132929_2160_3840_60fps_hxcwrx.mp4",
+    heroVideo: "https://res.cloudinary.com/dnj5bft7g/video/upload/v1785855719/12132929_2160_3840_60fps_1_kkiwsr.mp4",
   },
   {
     _id: "65d3ec62b083c659d81d6433",
@@ -97,7 +97,7 @@ export const MOCK_HOTELS = [
     policies: ["Check-in from 2:00 PM, Check-out by 12:00 PM"],
     mapCoordinates: { lat: 7.2185, lng: 79.8402 },
     featured: true,
-    heroVideo: "https://res.cloudinary.com/dnj5bft7g/video/upload/v1785814550/13263196_2160_3840_50fps_zwogpk.mp4",
+    heroVideo: "https://res.cloudinary.com/dnj5bft7g/video/upload/v1785858638/13263196_2160_3840_50fps_1_ijqdhg.mp4",
   },
   {
     _id: "65d3ec62b083c659d81d6434",
@@ -161,7 +161,7 @@ export const MOCK_HOTELS = [
     policies: ["Check-in from 2:00 PM, Check-out by 12:00 PM", "No pets allowed"],
     mapCoordinates: { lat: 6.9032, lng: 79.8550 },
     featured: true,
-    heroVideo: "https://res.cloudinary.com/dnj5bft7g/video/upload/v1785814550/13263196_2160_3840_50fps_zwogpk.mp4",
+    heroVideo: "https://res.cloudinary.com/dnj5bft7g/video/upload/v1785858638/13263196_2160_3840_50fps_1_ijqdhg.mp4",
   },
   {
     _id: "65d3ec62b083c659d81d6436",
@@ -193,7 +193,7 @@ export const MOCK_HOTELS = [
     policies: ["Check-in from 2:00 PM, Check-out by 12:00 PM"],
     mapCoordinates: { lat: 7.2925, lng: 80.6358 },
     featured: true,
-    heroVideo: "https://res.cloudinary.com/dnj5bft7g/video/upload/v1785814407/12132929_2160_3840_60fps_hxcwrx.mp4",
+    heroVideo: "https://res.cloudinary.com/dnj5bft7g/video/upload/v1785855719/12132929_2160_3840_60fps_1_kkiwsr.mp4",
   },
   {
     _id: "65d3ec62b083c659d81d6437",
@@ -256,7 +256,7 @@ export const MOCK_HOTELS = [
     policies: ["Check-in from 2:00 PM, Check-out by 12:00 PM", "Cash payment only at property"],
     mapCoordinates: { lat: 7.9304, lng: 81.5645 },
     featured: false,
-    heroVideo: "https://res.cloudinary.com/dnj5bft7g/video/upload/v1785814550/13263196_2160_3840_50fps_zwogpk.mp4",
+    heroVideo: "https://res.cloudinary.com/dnj5bft7g/video/upload/v1785858638/13263196_2160_3840_50fps_1_ijqdhg.mp4",
   },
 ];
 

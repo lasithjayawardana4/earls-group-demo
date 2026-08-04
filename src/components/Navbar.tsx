@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ArrowRight } from "lucide-react";
+import { Menu, X, ArrowRight, Sun, Moon } from "lucide-react";
 
 const navLinks = [
   { name: "Hotels", href: "/hotels" },
@@ -21,6 +21,25 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const isDark = document.documentElement.classList.contains("dark");
+    setTheme(isDark ? "dark" : "light");
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "light" ? "dark" : "light";
+    setTheme(nextTheme);
+    localStorage.setItem("theme", nextTheme);
+    if (nextTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -85,10 +104,23 @@ export default function Navbar() {
           </nav>
 
           {/* Book Now Button */}
-          <div className="hidden lg:flex items-center space-x-4">
+          <div className="hidden lg:flex items-center space-x-5">
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-luxury-ivory hover:text-luxury-gold transition-colors duration-300 focus:outline-none cursor-pointer flex items-center justify-center"
+              aria-label="Toggle Dark Mode"
+            >
+              {!mounted ? (
+                <div className="w-5 h-5 animate-pulse rounded-full bg-luxury-ivory/10" />
+              ) : theme === "dark" ? (
+                <Sun size={18} className="text-luxury-gold animate-[spin_10s_linear_infinite]" />
+              ) : (
+                <Moon size={18} />
+              )}
+            </button>
             <Link
               href="/admin"
-              className="text-xs text-luxury-ivory/60 hover:text-luxury-gold transition-colors duration-300 font-sans uppercase tracking-widest mr-2"
+              className="text-xs text-luxury-ivory/60 hover:text-luxury-gold transition-colors duration-300 font-sans uppercase tracking-widest"
             >
               Portal
             </Link>
@@ -97,14 +129,29 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Mobile Hamburger Menu */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-luxury-ivory hover:text-luxury-gold transition-colors focus:outline-none"
-            aria-label="Toggle Menu"
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {/* Mobile Dark Mode and Hamburger */}
+          <div className="flex lg:hidden items-center space-x-3">
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-luxury-ivory hover:text-luxury-gold transition-colors duration-300 focus:outline-none cursor-pointer flex items-center justify-center"
+              aria-label="Toggle Dark Mode"
+            >
+              {!mounted ? (
+                <div className="w-5 h-5 animate-pulse rounded-full bg-luxury-ivory/10" />
+              ) : theme === "dark" ? (
+                <Sun size={18} className="text-luxury-gold animate-[spin_10s_linear_infinite]" />
+              ) : (
+                <Moon size={18} />
+              )}
+            </button>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 text-luxury-ivory hover:text-luxury-gold transition-colors focus:outline-none"
+              aria-label="Toggle Menu"
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </motion.header>
 
