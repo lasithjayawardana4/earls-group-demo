@@ -22,17 +22,27 @@ if (!global.mongoose) {
   global.mongoose = cached;
 }
 
+// Keep track of the last failed attempt time to avoid consecutive timeout hangs
+let lastAttemptTime = 0;
+const RETRY_COOLDOWN = 15000; // 15 seconds cooldown
+
 async function dbConnect() {
   if (cached.conn) {
     return cached.conn;
   }
 
+  const now = Date.now();
+  if (now - lastAttemptTime < RETRY_COOLDOWN) {
+    throw new Error("MongoDB connection is in cooldown period after a recent failure.");
+  }
+
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
-      serverSelectionTimeoutMS: 1500, // Timeout connection after 1.5 seconds if MongoDB is offline
+      serverSelectionTimeoutMS: 800, // Timeout connection after 800ms if MongoDB is offline
     };
 
+    lastAttemptTime = now;
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongooseInstance) => {
       return mongooseInstance;
     });
@@ -42,6 +52,8 @@ async function dbConnect() {
     cached.conn = await cached.promise;
   } catch (e) {
     cached.promise = null;
+    // Update attempt time on failure to start the cooldown
+    lastAttemptTime = Date.now();
     throw e;
   }
 

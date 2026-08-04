@@ -17,6 +17,7 @@ export interface IHotel extends Document {
   policies: string[];
   mapCoordinates: { lat: number; lng: number };
   featured: boolean;
+  heroVideo?: string;
 }
 
 const HotelSchema: Schema = new Schema(
@@ -58,6 +59,7 @@ const HotelSchema: Schema = new Schema(
       lng: { type: Number },
     },
     featured: { type: Boolean, default: false },
+    heroVideo: { type: String },
   },
   { timestamps: true }
 );

@@ -106,6 +106,25 @@ export default async function Home() {
 
       {/* Client-side animations wrapper */}
       <HomeClientEffects>
+        {/* Full-bleed Brand Showcase Video */}
+        <section className="relative w-full h-[60vh] md:h-[85vh] overflow-hidden bg-luxury-black border-b border-luxury-gold/5">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          >
+            <source
+              src="https://res.cloudinary.com/dnj5bft7g/video/upload/v1785816402/12834077_3840_2160_24fps_pjaxtq.mp4"
+              type="video/mp4"
+            />
+          </video>
+          {/* Subtle top and bottom overlays to blend with neighboring sections */}
+          <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-luxury-black to-transparent pointer-events-none z-10" />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-luxury-black to-transparent pointer-events-none z-10" />
+        </section>
+
         {/* 2. Luxury Introduction */}
         <section id="introduction" className="py-28 px-6 bg-luxury-charcoal border-y border-luxury-gold/5">
           <div className="max-w-4xl mx-auto text-center">
