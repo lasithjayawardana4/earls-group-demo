@@ -13,16 +13,21 @@ export default async function SpaPage() {
   return (
     <div className="relative min-h-screen bg-luxury-black">
       {/* Hero */}
-      <section className="relative h-[65vh] w-full flex items-end justify-center overflow-hidden">
+      <section className="relative h-[70vh] md:h-[80vh] w-full flex items-end justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <Image
-            src="https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=1920&q=80"
-            alt="Wellness Spa by Earls"
-            fill
-            priority
-            className="object-cover filter brightness-95 contrast-95"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-luxury-black/50 to-luxury-black z-10" />
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover filter brightness-[0.98]"
+          >
+            <source
+              src="https://res.cloudinary.com/dnj5bft7g/video/upload/v1785899838/6187898-uhd_3840_2160_25fps_1_ff5sli.mp4"
+              type="video/mp4"
+            />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-luxury-black z-10" />
         </div>
         <div className="relative z-20 max-w-4xl mx-auto text-center px-6 pb-16">
           <span className="text-xs tracking-[0.4em] uppercase text-luxury-gold mb-4 block">

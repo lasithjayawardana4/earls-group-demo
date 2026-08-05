@@ -23,6 +23,7 @@ export async function POST(req: Request) {
       price,
       specialRequests,
       promoCode,
+      visitorType,
     } = body;
 
     // Validate dates
@@ -46,6 +47,7 @@ export async function POST(req: Request) {
         price,
         specialRequests,
         promoCode,
+        visitorType: visitorType || "local",
         bookingStatus: "Confirmed",
       });
 
@@ -73,6 +75,7 @@ export async function POST(req: Request) {
         price,
         specialRequests,
         promoCode,
+        visitorType: visitorType || "local",
         bookingStatus: "Confirmed",
         createdAt: new Date(),
         updatedAt: new Date(),

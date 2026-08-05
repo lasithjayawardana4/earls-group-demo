@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   TrendingUp,
   DollarSign,
@@ -27,6 +28,15 @@ import {
   Legend
 } from "recharts";
 
+const formatDate = (dateStr: string) => {
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${day}/${month}/${year}`;
+};
+
 interface AdminDashboardClientProps {
   initialBookings: any[];
   hotels: any[];
@@ -37,6 +47,7 @@ export default function AdminDashboardClient({
   hotels,
 }: AdminDashboardClientProps) {
   const [activeTab, setActiveTab] = useState("overview");
+  const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
 
   // Mock bookings fallback if empty
   const [bookings, setBookings] = useState<any[]>(
@@ -281,8 +292,8 @@ export default function AdminDashboardClient({
                         <div className="text-[0.65rem] text-luxury-gold/60">{roomName}</div>
                       </td>
                       <td className="p-4">
-                        <div>{new Date(booking.checkIn).toLocaleDateString()}</div>
-                        <div className="text-[0.65rem] text-luxury-ivory/40">to {new Date(booking.checkOut).toLocaleDateString()}</div>
+                        <div>{formatDate(booking.checkIn)}</div>
+                        <div className="text-[0.65rem] text-luxury-ivory/40">to {formatDate(booking.checkOut)}</div>
                       </td>
                       <td className="p-4 font-medium text-luxury-gold">${booking.price}</td>
                       <td className="p-4">
@@ -299,6 +310,13 @@ export default function AdminDashboardClient({
                         </span>
                       </td>
                       <td className="p-4 flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => setSelectedBooking(booking)}
+                          title="View Details"
+                          className="p-1.5 border border-luxury-gold/20 text-luxury-gold hover:bg-luxury-gold/10 transition-colors"
+                        >
+                          <Eye size={14} />
+                        </button>
                         {booking.bookingStatus === "Pending" && (
                           <button
                             onClick={() => handleUpdateStatus(booking._id, "Confirmed")}
@@ -374,6 +392,150 @@ export default function AdminDashboardClient({
           </div>
         )}
       </div>
+
+      {/* Details Modal */}
+      <AnimatePresence>
+        {selectedBooking && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedBooking(null)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-pointer"
+            />
+            {/* Modal Box */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-full max-w-2xl bg-luxury-black border border-luxury-gold/25 p-8 md:p-10 shadow-2xl z-10 glass-panel"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedBooking(null)}
+                className="absolute top-6 right-6 text-luxury-ivory/60 hover:text-luxury-gold transition-colors focus:outline-none cursor-pointer"
+                aria-label="Close details"
+              >
+                <XCircle size={22} />
+              </button>
+
+              <div className="space-y-6">
+                {/* Header */}
+                <div className="border-b border-luxury-gold/10 pb-4">
+                  <span className="text-[0.6rem] tracking-[0.4em] uppercase text-luxury-gold block mb-1">
+                    Booking Registry Details
+                  </span>
+                  <h3 className="font-serif text-2xl text-luxury-ivory">
+                    Reference: <span className="font-mono text-lg">{selectedBooking._id}</span>
+                  </h3>
+                </div>
+
+                {/* Details Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 text-xs">
+                  {/* Guest Information */}
+                  <div className="space-y-4">
+                    <h4 className="font-serif text-sm text-luxury-gold uppercase tracking-wider border-b border-luxury-gold/5 pb-1">
+                      Guest Profile
+                    </h4>
+                    <div className="space-y-2 font-light">
+                      <div>
+                        <span className="text-luxury-ivory/50 block text-[0.65rem] uppercase tracking-wider">Full Name</span>
+                        <span className="text-luxury-ivory font-medium text-sm">{selectedBooking.guestName}</span>
+                      </div>
+                      <div>
+                        <span className="text-luxury-ivory/50 block text-[0.65rem] uppercase tracking-wider">Email Address</span>
+                        <span className="text-luxury-ivory">{selectedBooking.email}</span>
+                      </div>
+                      <div>
+                        <span className="text-luxury-ivory/50 block text-[0.65rem] uppercase tracking-wider">Phone Number</span>
+                        <span className="text-luxury-ivory">{selectedBooking.phone}</span>
+                      </div>
+                      <div>
+                        <span className="text-luxury-ivory/50 block text-[0.65rem] uppercase tracking-wider">Visitor Origin</span>
+                        <span className="text-luxury-gold uppercase tracking-widest font-medium">
+                          {selectedBooking.visitorType === "international" ? "International visitor" : "Local visitor"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Reservation Information */}
+                  <div className="space-y-4">
+                    <h4 className="font-serif text-sm text-luxury-gold uppercase tracking-wider border-b border-luxury-gold/5 pb-1">
+                      Reservation Summary
+                    </h4>
+                    <div className="space-y-2 font-light">
+                      <div>
+                        <span className="text-luxury-ivory/50 block text-[0.65rem] uppercase tracking-wider">Hotel / Sanctuary</span>
+                        <span className="text-luxury-ivory font-serif text-sm">{selectedBooking.hotel?.name || "Earls Hotel"}</span>
+                      </div>
+                      <div>
+                        <span className="text-luxury-ivory/50 block text-[0.65rem] uppercase tracking-wider">Suite / Villa Type</span>
+                        <span className="text-luxury-ivory font-serif">{selectedBooking.room?.name || "Premium Room"}</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <span className="text-luxury-ivory/50 block text-[0.65rem] uppercase tracking-wider">Check-In</span>
+                          <span className="text-luxury-ivory">{formatDate(selectedBooking.checkIn)}</span>
+                        </div>
+                        <div>
+                          <span className="text-luxury-ivory/50 block text-[0.65rem] uppercase tracking-wider">Check-Out</span>
+                          <span className="text-luxury-ivory">{formatDate(selectedBooking.checkOut)}</span>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <span className="text-luxury-ivory/50 block text-[0.65rem] uppercase tracking-wider">Occupancy</span>
+                          <span className="text-luxury-ivory">{selectedBooking.adults} Adults, {selectedBooking.children || 0} Children</span>
+                        </div>
+                        <div>
+                          <span className="text-luxury-ivory/50 block text-[0.65rem] uppercase tracking-wider">Total Charge</span>
+                          <span className="text-luxury-gold font-medium">${selectedBooking.price}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Additional Info */}
+                <div className="space-y-4 border-t border-luxury-gold/10 pt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-light">
+                    <div>
+                      <span className="text-luxury-ivory/50 block text-[0.65rem] uppercase tracking-wider">Promo Code</span>
+                      <span className="text-luxury-ivory font-mono uppercase">{selectedBooking.promoCode || "None Applied"}</span>
+                    </div>
+                    <div>
+                      <span className="text-luxury-ivory/50 block text-[0.65rem] uppercase tracking-wider">Registry Status</span>
+                      <span className={`inline-block text-[0.65rem] uppercase tracking-widest font-semibold ${
+                        selectedBooking.bookingStatus === "Confirmed" ? "text-green-400" : selectedBooking.bookingStatus === "Pending" ? "text-yellow-400" : "text-red-400"
+                      }`}>
+                        {selectedBooking.bookingStatus}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-luxury-ivory/50 block text-[0.65rem] uppercase tracking-wider mb-1">Special Requests</span>
+                    <p className="p-3 bg-luxury-charcoal/30 border border-luxury-gold/5 text-luxury-ivory/80 italic text-xs font-light leading-relaxed">
+                      {selectedBooking.specialRequests ? `"${selectedBooking.specialRequests}"` : "No special requests specified."}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Close modal panel button */}
+                <button
+                  onClick={() => setSelectedBooking(null)}
+                  className="btn-gold w-full py-3.5 text-xs font-sans tracking-widest"
+                >
+                  DISMISS REGISTRY VIEW
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

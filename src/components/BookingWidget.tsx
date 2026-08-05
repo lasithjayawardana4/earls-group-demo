@@ -37,6 +37,7 @@ export default function BookingWidget({
   const [guestName, setGuestName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [visitorType, setVisitorType] = useState<"local" | "international">("local");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -104,6 +105,7 @@ export default function BookingWidget({
           price: Math.round(totalPrice),
           specialRequests,
           promoCode,
+          visitorType,
         }),
       });
 
@@ -259,6 +261,36 @@ export default function BookingWidget({
 
         {/* Guest Details */}
         <div className="border-t border-luxury-gold/10 pt-4 mt-6 space-y-4">
+          <div>
+            <label className="block text-[0.6rem] tracking-widest text-luxury-ivory/50 uppercase mb-2">
+              Visitor Origin
+            </label>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => setVisitorType("local")}
+                className={`py-2.5 text-xs tracking-wider uppercase border font-sans font-medium transition-all duration-300 cursor-pointer ${
+                  visitorType === "local"
+                    ? "bg-luxury-gold text-luxury-black border-luxury-gold"
+                    : "bg-luxury-charcoal/50 text-luxury-ivory/60 border-luxury-gold/15 hover:text-luxury-gold hover:border-luxury-gold/50"
+                }`}
+              >
+                Local Visitor
+              </button>
+              <button
+                type="button"
+                onClick={() => setVisitorType("international")}
+                className={`py-2.5 text-xs tracking-wider uppercase border font-sans font-medium transition-all duration-300 cursor-pointer ${
+                  visitorType === "international"
+                    ? "bg-luxury-gold text-luxury-black border-luxury-gold"
+                    : "bg-luxury-charcoal/50 text-luxury-ivory/60 border-luxury-gold/15 hover:text-luxury-gold hover:border-luxury-gold/50"
+                }`}
+              >
+                International
+              </button>
+            </div>
+          </div>
+
           <div>
             <label className="block text-[0.6rem] tracking-widest text-luxury-ivory/50 uppercase mb-2">
               Full Name

@@ -14,6 +14,7 @@ export interface IBooking extends Document {
   bookingStatus: "Pending" | "Confirmed" | "Cancelled";
   specialRequests?: string;
   promoCode?: string;
+  visitorType: "local" | "international";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -37,6 +38,12 @@ const BookingSchema: Schema = new Schema(
     },
     specialRequests: { type: String },
     promoCode: { type: String },
+    visitorType: {
+      type: String,
+      enum: ["local", "international"],
+      required: true,
+      default: "local",
+    },
   },
   { timestamps: true }
 );

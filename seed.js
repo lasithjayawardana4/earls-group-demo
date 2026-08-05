@@ -1,7 +1,32 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const fs = require("fs");
+const path = require("path");
 
-const MONGODB_URI = "mongodb://localhost:27017/earls_group";
+// Load .env.local manually if it exists to support standalone execution
+try {
+  const envPath = path.join(__dirname, ".env.local");
+  if (fs.existsSync(envPath)) {
+    const envConfig = fs.readFileSync(envPath, "utf-8");
+    envConfig.split(/\r?\n/).forEach((line) => {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith("#")) {
+        const parts = trimmed.split("=");
+        if (parts.length >= 2) {
+          const key = parts[0].trim();
+          const value = parts.slice(1).join("=").trim().replace(/^['"]|['"]$/g, "");
+          if (key && value) {
+            process.env[key] = value;
+          }
+        }
+      }
+    });
+  }
+} catch (err) {
+  console.warn("Failed to load .env.local file:", err);
+}
+
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/earls_group";
 
 // Define Schemas inline so we don't have to compile TS files
 const HotelSchema = new mongoose.Schema({
