@@ -30,6 +30,13 @@ export default function Navbar() {
     setTheme(isDark ? "dark" : "light");
   }, []);
 
+  // Sync navbar theme state when route changes (e.g. going to/from Spa page)
+  useEffect(() => {
+    if (!mounted) return;
+    const isDark = document.documentElement.classList.contains("dark");
+    setTheme(isDark ? "dark" : "light");
+  }, [pathname, mounted]);
+
   const toggleTheme = () => {
     const nextTheme = theme === "light" ? "dark" : "light";
     setTheme(nextTheme);
@@ -89,7 +96,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8">
+          <nav className="hidden lg:flex items-center lg:space-x-4 xl:space-x-8">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
@@ -104,7 +111,7 @@ export default function Navbar() {
           </nav>
 
           {/* Book Now Button */}
-          <div className="hidden lg:flex items-center space-x-5">
+          <div className="hidden lg:flex items-center lg:space-x-3 xl:space-x-5">
             <button
               onClick={toggleTheme}
               className="p-2 text-luxury-ivory hover:text-luxury-gold transition-colors duration-300 focus:outline-none cursor-pointer flex items-center justify-center"
@@ -155,55 +162,69 @@ export default function Navbar() {
         </div>
       </motion.header>
 
-      {/* Fullscreen Mobile Menu */}
+      {/* Mobile Menu Drawer */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
-            className="fixed inset-0 z-40 bg-luxury-black/95 backdrop-blur-lg flex flex-col justify-between pt-32 pb-12 px-8 lg:hidden"
-            initial={{ opacity: 0, y: "-100%" }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: "-100%" }}
-            transition={{ type: "tween", duration: 0.5, ease: "easeInOut" }}
-          >
-            <nav className="flex flex-col space-y-6">
-              {navLinks.map((link, idx) => (
-                <motion.div
-                  key={link.name}
-                  initial={{ opacity: 0, x: -50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.05, duration: 0.4 }}
-                >
-                  <Link
-                    href={link.href}
-                    className={`font-serif text-3xl tracking-wider block ${
-                      pathname === link.href ? "text-luxury-gold" : "text-luxury-ivory"
-                    }`}
-                  >
-                    {link.name}
-                  </Link>
-                </motion.div>
-              ))}
-            </nav>
-
+          <>
+            {/* Backdrop */}
             <motion.div
-              className="flex flex-col space-y-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+            />
+            
+            {/* Drawer */}
+            <motion.div
+              className="fixed top-0 right-0 bottom-0 w-full max-w-xs z-40 bg-luxury-black/95 border-l border-luxury-gold/15 flex flex-col justify-between pt-28 pb-8 px-6 lg:hidden"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "tween", duration: 0.35, ease: "easeOut" }}
             >
-              <Link
-                href="/hotels"
-                className="btn-gold py-4 w-full flex items-center justify-center space-x-2 font-sans rounded-none"
+              <nav className="flex flex-col space-y-6">
+                {navLinks.map((link, idx) => (
+                  <motion.div
+                    key={link.name}
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.04, duration: 0.3 }}
+                  >
+                    <Link
+                      href={link.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`font-serif text-2xl tracking-wider block ${
+                        pathname === link.href ? "text-luxury-gold" : "text-luxury-ivory"
+                      }`}
+                    >
+                      {link.name}
+                    </Link>
+                  </motion.div>
+                ))}
+              </nav>
+
+              <motion.div
+                className="flex flex-col space-y-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
               >
-                <span>Book Your Stay</span>
-                <ArrowRight size={16} />
-              </Link>
-              <div className="flex justify-between text-xs tracking-wider text-luxury-ivory/40">
-                <Link href="/admin/login">Admin Dashboard</Link>
-                <span>© {new Date().getFullYear()} Earls Group</span>
-              </div>
+                <Link
+                  href="/hotels"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="btn-gold py-3 w-full flex items-center justify-center space-x-2 font-sans rounded-none text-xs"
+                >
+                  <span>Book Your Stay</span>
+                  <ArrowRight size={14} />
+                </Link>
+                <div className="flex justify-between text-[0.65rem] tracking-wider text-luxury-ivory/40">
+                  <Link href="/admin/login" onClick={() => setMobileMenuOpen(false)}>Admin Dashboard</Link>
+                  <span>© {new Date().getFullYear()} Earls Group</span>
+                </div>
+              </motion.div>
             </motion.div>
-          </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>

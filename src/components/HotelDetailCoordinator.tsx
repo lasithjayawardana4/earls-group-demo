@@ -33,6 +33,7 @@ export default function HotelDetailCoordinator({
   const [selectedRoomSlug, setSelectedRoomSlug] = useState(rooms[0]?.slug || "deluxe-room");
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const [openFAQIndex, setOpenFAQIndex] = useState<number | null>(null);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
 
   const searchParams = useSearchParams();
   const roomParam = searchParams.get("room");
@@ -42,29 +43,19 @@ export default function HotelDetailCoordinator({
       setSelectedRoomSlug(roomParam);
       const hash = window.location.hash;
       if (hash === "#booking-card") {
-        setTimeout(() => {
-          const widget = document.getElementById("booking-card");
-          if (widget) {
-            widget.scrollIntoView({ behavior: "smooth", block: "center" });
-          }
-        }, 300);
+        setIsBookingOpen(true);
       }
     }
   }, [roomParam, rooms]);
 
-  // Scroll to booking widget
+  // Open booking modal
   const handleReserveRoom = (roomSlug: string) => {
     setSelectedRoomSlug(roomSlug);
-    const widget = document.getElementById("booking-card");
-    if (widget) {
-      widget.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
+    setIsBookingOpen(true);
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-16 relative">
-      {/* Left Column: Hotel Info & Rooms */}
-      <div className="lg:col-span-2 space-y-20">
+    <div className="w-full space-y-20 relative">
         {/* Description */}
         <section id="about" className="space-y-6">
           <h3 className="font-serif text-3xl text-luxury-ivory tracking-wide">
@@ -87,13 +78,15 @@ export default function HotelDetailCoordinator({
           </div>
 
           <div className="space-y-12">
-            {rooms.map((room) => (
+            {rooms.map((room, idx) => (
               <div
                 key={room.slug}
-                className="group border border-luxury-gold/10 bg-luxury-charcoal/20 flex flex-col md:flex-row overflow-hidden hover:border-luxury-gold/30 transition-all duration-500"
+                className={`group border border-luxury-gold/10 bg-luxury-charcoal/20 flex flex-col ${
+                  idx % 2 === 1 ? "md:flex-row-reverse" : "md:flex-row"
+                } overflow-hidden hover:border-luxury-gold/30 transition-all duration-500`}
               >
                 {/* Room Image */}
-                <div className="relative w-full md:w-80 h-64 md:h-auto overflow-hidden">
+                <div className="relative w-full md:w-[420px] h-64 md:h-auto overflow-hidden">
                   <Image
                     src={room.images[0] || hotel.images[0]}
                     alt={room.name}
@@ -356,19 +349,48 @@ export default function HotelDetailCoordinator({
             ))}
           </ul>
         </section>
-      </div>
 
-      {/* Right Column: Sticky Booking Widget */}
-      <div className="lg:col-span-1">
-        <div id="booking-card" className="lg:sticky lg:top-28">
-          <BookingWidget
-            hotel={hotel}
-            rooms={rooms}
-            selectedRoomSlug={selectedRoomSlug}
-            onSelectRoomSlug={(slug) => setSelectedRoomSlug(slug)}
-          />
-        </div>
-      </div>
+        {/* Booking Modal */}
+        <AnimatePresence>
+          {isBookingOpen && (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsBookingOpen(false)}
+                className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              />
+              
+              {/* Modal Card */}
+              <motion.div
+                data-lenis-prevent
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="relative w-full max-w-xl z-10 bg-white rounded-2xl booking-widget-card border border-zinc-100"
+              >
+                {/* Close Button */}
+                <button
+                  onClick={() => setIsBookingOpen(false)}
+                  className="absolute top-5 right-5 w-8 h-8 rounded-full border border-zinc-200 hover:border-luxury-gold/50 hover:bg-zinc-50 flex items-center justify-center text-zinc-400 hover:text-luxury-gold hover:rotate-90 transition-all duration-300 z-30 cursor-pointer"
+                  aria-label="Close Booking Modal"
+                >
+                  <X size={15} />
+                </button>
+
+                <BookingWidget
+                  hotel={hotel}
+                  rooms={rooms}
+                  selectedRoomSlug={selectedRoomSlug}
+                  onSelectRoomSlug={(slug) => setSelectedRoomSlug(slug)}
+                />
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
 
       {/* Lightbox Modal */}
       <AnimatePresence>

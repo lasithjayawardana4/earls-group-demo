@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { getSpaTreatments } from "@/lib/data";
 import SpaBookingForm from "@/components/SpaBookingForm";
+import SpaThemeEnforcer from "@/components/SpaThemeEnforcer";
 
 export const metadata = {
   title: "Ayurveda & Spa | Earls Group Sri Lanka",
@@ -12,6 +13,7 @@ export default async function SpaPage() {
 
   return (
     <div className="relative min-h-screen bg-luxury-black">
+      <SpaThemeEnforcer />
       {/* Hero */}
       <section className="relative h-[70vh] md:h-[80vh] w-full flex items-end justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">

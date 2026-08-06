@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IBooking extends Document {
   guestName: string;
-  email: string;
+  email?: string;
   phone: string;
   hotel: mongoose.Types.ObjectId;
   room: mongoose.Types.ObjectId;
@@ -22,7 +22,7 @@ export interface IBooking extends Document {
 const BookingSchema: Schema = new Schema(
   {
     guestName: { type: String, required: true },
-    email: { type: String, required: true },
+    email: { type: String, required: false },
     phone: { type: String, required: true },
     hotel: { type: Schema.Types.ObjectId, ref: "Hotel", required: true },
     room: { type: Schema.Types.ObjectId, ref: "Room", required: true },

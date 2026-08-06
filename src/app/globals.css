@@ -139,6 +139,52 @@ html.lenis, html.lenis body {
   border: 1px solid var(--glass-panel-border);
 }
 
+/* Premium scrollbar for glass panels */
+.glass-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.glass-panel::-webkit-scrollbar-thumb {
+  background: rgba(158, 116, 40, 0.25);
+  border: none;
+}
+
+.glass-panel::-webkit-scrollbar-thumb:hover {
+  background: var(--color-luxury-gold);
+}
+
+/* Premium Booking Widget Card Scrollable Setup */
+.booking-widget-card {
+  border-top: 3px solid var(--luxury-gold) !important;
+  box-shadow: 0 25px 50px -12px rgba(158, 116, 40, 0.25), 0 0 50px rgba(158, 116, 40, 0.08) !important;
+}
+
+@media (min-width: 1024px) {
+  .booking-widget-card {
+    max-height: calc(100vh - 200px) !important;
+    overflow-y: auto !important;
+    position: relative;
+  }
+}
+
+.booking-widget-card::-webkit-scrollbar {
+  width: 6px;
+}
+
+.booking-widget-card::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.booking-widget-card::-webkit-scrollbar-thumb {
+  background: rgba(158, 116, 40, 0.3) !important;
+  border-radius: 3px;
+  border: none !important;
+}
+
+.booking-widget-card::-webkit-scrollbar-thumb:hover {
+  background: var(--color-luxury-gold) !important;
+}
+
 .glass-panel-light {
   background: var(--glass-panel-light-bg);
   backdrop-filter: blur(12px);
