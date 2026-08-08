@@ -18,6 +18,7 @@ import {
   Calendar
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { getOptimizedVideoUrl } from "@/lib/cloudinary";
 
 interface RoomDetailCoordinatorProps {
   hotel: any;
@@ -83,7 +84,7 @@ export default function RoomDetailCoordinator({ hotel, room }: RoomDetailCoordin
               <>
                 <video
                   ref={videoRef}
-                  src={room.video}
+                  src={getOptimizedVideoUrl(room.video)}
                   autoPlay
                   muted={isMuted}
                   loop

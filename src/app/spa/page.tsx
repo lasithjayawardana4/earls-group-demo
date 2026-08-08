@@ -2,6 +2,7 @@ import Image from "next/image";
 import { getSpaTreatments } from "@/lib/data";
 import SpaBookingForm from "@/components/SpaBookingForm";
 import SpaThemeEnforcer from "@/components/SpaThemeEnforcer";
+import { getOptimizedVideoUrl } from "@/lib/cloudinary";
 
 export const metadata = {
   title: "Ayurveda & Spa | Earls Group Sri Lanka",
@@ -25,7 +26,7 @@ export default async function SpaPage() {
             className="w-full h-full object-cover filter brightness-[0.98]"
           >
             <source
-              src="https://res.cloudinary.com/dnj5bft7g/video/upload/v1785899838/6187898-uhd_3840_2160_25fps_1_ff5sli.mp4"
+              src={getOptimizedVideoUrl("https://res.cloudinary.com/dnj5bft7g/video/upload/v1785899838/6187898-uhd_3840_2160_25fps_1_ff5sli.mp4")}
               type="video/mp4"
             />
           </video>

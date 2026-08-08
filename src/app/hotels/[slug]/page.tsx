@@ -4,6 +4,7 @@ import HotelDetailCoordinator from "@/components/HotelDetailCoordinator";
 import Image from "next/image";
 import { Star, MapPin } from "lucide-react";
 import { Suspense } from "react";
+import { getOptimizedVideoUrl } from "@/lib/cloudinary";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -39,7 +40,7 @@ export default async function HotelDetailPage({ params }: Props) {
         <div className="absolute inset-0 z-0">
           {hotel.heroVideo ? (
             <video
-              src={hotel.heroVideo}
+              src={getOptimizedVideoUrl(hotel.heroVideo)}
               autoPlay
               loop
               muted
