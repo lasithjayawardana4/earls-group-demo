@@ -59,12 +59,19 @@ export default async function Home() {
       <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
         {/* Background Video with Light Overlay */}
         <div className="absolute inset-0 z-0">
+          <Image
+            src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1920&q=80"
+            alt="Earls Group Luxury Resort"
+            fill
+            priority
+            className="object-cover scale-105 filter brightness-95 contrast-100"
+          />
           <video
             autoPlay
             loop
             muted
             playsInline
-            className="w-full h-full object-cover scale-105 filter brightness-95 contrast-100"
+            className="absolute inset-0 w-full h-full object-cover scale-105 filter brightness-95 contrast-100"
             poster="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1920&q=80"
           >
             <source
@@ -109,12 +116,19 @@ export default async function Home() {
       <HomeClientEffects>
         {/* Full-bleed Brand Showcase Video */}
         <section className="relative w-full h-[60vh] md:h-[85vh] overflow-hidden bg-luxury-black border-b border-luxury-gold/5">
+          <Image
+            src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1920&q=80"
+            alt="Brand Showcase"
+            fill
+            priority
+            className="object-cover"
+          />
           <video
             autoPlay
             loop
             muted
             playsInline
-            className="w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
           >
             <source
               src={getOptimizedVideoUrl("https://res.cloudinary.com/dnj5bft7g/video/upload/v1785854256/12834077_3840_2160_24fps_1_dbssqu.mp4")}

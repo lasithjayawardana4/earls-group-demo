@@ -16,12 +16,19 @@ export default async function WeddingsPage() {
       {/* Hero */}
       <section className="relative h-[70vh] md:h-[80vh] w-full flex items-end justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
+          <Image
+            src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1920&q=80"
+            alt="Weddings & Celebrations"
+            fill
+            priority
+            className="object-cover filter brightness-[0.98]"
+          />
           <video
             autoPlay
             loop
             muted
             playsInline
-            className="w-full h-full object-cover filter brightness-[0.98]"
+            className="absolute inset-0 w-full h-full object-cover filter brightness-[0.98]"
           >
             <source
               src={getOptimizedVideoUrl("https://res.cloudinary.com/dnj5bft7g/video/upload/v1785898558/12279936_1920_1080_25fps_cpzdg7.mp4")}
