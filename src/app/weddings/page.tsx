@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { getWeddings } from "@/lib/data";
 import WeddingForm from "@/components/WeddingForm";
-import { getOptimizedVideoUrl } from "@/lib/cloudinary";
 
 export const metadata = {
   title: "Weddings & Celebrations | Earls Group Sri Lanka",
@@ -24,7 +23,7 @@ export default async function WeddingsPage() {
             className="w-full h-full object-cover filter brightness-[0.98]"
           >
             <source
-              src={getOptimizedVideoUrl("https://res.cloudinary.com/dnj5bft7g/video/upload/v1785898558/12279936_1920_1080_25fps_cpzdg7.mp4")}
+              src="https://res.cloudinary.com/dnj5bft7g/video/upload/v1785898558/12279936_1920_1080_25fps_cpzdg7.mp4"
               type="video/mp4"
             />
           </video>

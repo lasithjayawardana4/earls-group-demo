@@ -12,16 +12,7 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    "seed.js",
   ]),
-  {
-    rules: {
-      "@typescript-eslint/no-explicit-any": "off",
-      "react-hooks/set-state-in-effect": "off",
-      "prefer-const": "off",
-      "@typescript-eslint/no-unused-vars": "off",
-    },
-  },
 ]);
 
 export default eslintConfig;

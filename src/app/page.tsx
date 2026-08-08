@@ -3,7 +3,6 @@ import Image from "next/image";
 import { getHotels, getTestimonials } from "@/lib/data";
 import { Star, Award, Compass, Heart, UtensilsCrossed, Sparkles } from "lucide-react";
 import HomeClientEffects from "@/components/HomeClientEffects";
-import { getOptimizedVideoUrl } from "@/lib/cloudinary";
 
 export default async function Home() {
   const hotels = await getHotels();
@@ -117,7 +116,7 @@ export default async function Home() {
             className="w-full h-full object-cover"
           >
             <source
-              src={getOptimizedVideoUrl("https://res.cloudinary.com/dnj5bft7g/video/upload/v1785854256/12834077_3840_2160_24fps_1_dbssqu.mp4")}
+              src="https://res.cloudinary.com/dnj5bft7g/video/upload/v1785854256/12834077_3840_2160_24fps_1_dbssqu.mp4"
               type="video/mp4"
             />
           </video>

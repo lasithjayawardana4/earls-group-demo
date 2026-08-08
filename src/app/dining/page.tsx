@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { getRestaurants } from "@/lib/data";
 import DiningReservationForm from "@/components/DiningReservationForm";
-import { getOptimizedVideoUrl } from "@/lib/cloudinary";
 
 export const metadata = {
   title: "Fine Dining | Earls Group Sri Lanka",
@@ -24,7 +23,7 @@ export default async function DiningPage() {
             className="w-full h-full object-cover filter brightness-[0.98]"
           >
             <source
-              src={getOptimizedVideoUrl("https://res.cloudinary.com/dnj5bft7g/video/upload/v1785901114/8764783-uhd_3840_2160_25fps_1_uwhawk.mp4")}
+              src="https://res.cloudinary.com/dnj5bft7g/video/upload/v1785901114/8764783-uhd_3840_2160_25fps_1_uwhawk.mp4"
               type="video/mp4"
             />
           </video>
