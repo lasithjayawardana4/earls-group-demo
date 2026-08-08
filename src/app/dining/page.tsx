@@ -16,19 +16,12 @@ export default async function DiningPage() {
       {/* Hero */}
       <section className="relative h-[70vh] md:h-[80vh] w-full flex items-end justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <Image
-            src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=1920&q=80"
-            alt="Fine Dining"
-            fill
-            priority
-            className="object-cover filter brightness-[0.98]"
-          />
           <video
             autoPlay
             loop
             muted
             playsInline
-            className="absolute inset-0 w-full h-full object-cover filter brightness-[0.98]"
+            className="w-full h-full object-cover filter brightness-[0.98]"
           >
             <source
               src={getOptimizedVideoUrl("https://res.cloudinary.com/dnj5bft7g/video/upload/v1785901114/8764783-uhd_3840_2160_25fps_1_uwhawk.mp4")}

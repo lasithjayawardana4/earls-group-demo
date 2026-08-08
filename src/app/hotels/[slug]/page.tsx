@@ -38,21 +38,22 @@ export default async function HotelDetailPage({ params }: Props) {
       {/* Immersive Hero */}
       <section className="relative h-[80vh] w-full flex items-end justify-start overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <Image
-            src={hotel.images[0]}
-            alt={hotel.name}
-            fill
-            priority
-            className="object-cover"
-          />
-          {hotel.heroVideo && (
+          {hotel.heroVideo ? (
             <video
               src={getOptimizedVideoUrl(hotel.heroVideo)}
               autoPlay
               loop
               muted
               playsInline
-              className="absolute inset-0 w-full h-full object-cover"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <Image
+              src={hotel.images[0]}
+              alt={hotel.name}
+              fill
+              priority
+              className="object-cover"
             />
           )}
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-luxury-black z-10" />
