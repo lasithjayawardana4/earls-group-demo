@@ -280,24 +280,6 @@ export default function BookingWidget({
           </div>
         </div>
 
-        {/* Special Requests */}
-        <div>
-          <label className="block text-[0.55rem] lg:text-[0.6rem] tracking-widest text-zinc-500 uppercase mb-2 font-medium">
-            Special Requests
-          </label>
-          <div className="relative">
-            <span className="absolute left-3 top-3 text-luxury-gold/70 pointer-events-none z-10">
-              <MessageSquare size={13} />
-            </span>
-            <textarea
-              placeholder="Dietary requests, room positioning..."
-              value={specialRequests}
-              onChange={(e) => setSpecialRequests(e.target.value)}
-              rows={2}
-              className="w-full bg-zinc-50 border border-zinc-200 hover:border-luxury-gold/40 focus:border-luxury-gold/60 focus:ring-1 focus:ring-luxury-gold/20 focus:bg-white py-2 pl-9 pr-3 text-xs text-zinc-800 focus:outline-none rounded-lg resize-none placeholder:text-zinc-400 transition-all duration-300"
-            />
-          </div>
-        </div>
 
         {/* Guest Details */}
         <div className="border-t border-zinc-100 pt-4 mt-4 space-y-4">

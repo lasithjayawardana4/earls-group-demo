@@ -71,33 +71,32 @@ export default async function Home() {
               type="video/mp4"
             />
           </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-luxury-black/92 via-luxury-black/85 to-luxury-black z-10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-luxury-black z-10" />
         </div>
-
         {/* Hero Content */}
         <div className="relative z-20 text-center px-6 max-w-4xl flex flex-col items-center">
-          <span className="text-xs md:text-sm tracking-[0.4em] uppercase text-luxury-gold mb-6 font-sans">
+          <span className="text-xs md:text-sm tracking-[0.5em] uppercase text-[#D4AF37] font-semibold mb-6 font-sans drop-shadow-[0_2px_8px_rgba(212,175,55,0.45)]">
             Earls Group Sri Lanka
           </span>
-          <h1 className="font-serif text-5xl md:text-8xl text-luxury-ivory tracking-wide leading-tight mb-8">
-            Discover the Art of <span className="text-gold-gradient italic">Luxury</span>
+          <h1 className="font-serif text-5xl md:text-8xl tracking-wide leading-tight mb-8 drop-shadow-[0_4px_20px_rgba(0,0,0,0.6)]">
+            <span className="text-shiny-ivory">Discover the Art of </span>
+            <span className="text-shiny-gold italic block sm:inline mt-2 sm:mt-0">Luxury</span>
           </h1>
-          <p className="text-sm md:text-base tracking-[0.2em] uppercase font-light text-luxury-silver max-w-2xl mb-12 leading-relaxed">
+          <p className="text-sm md:text-base tracking-[0.2em] uppercase font-light text-[#E5D4BC] max-w-2xl mb-12 leading-relaxed drop-shadow-[0_2px_5px_rgba(0,0,0,0.5)]">
             Five Exceptional Destinations.<br />One Unforgettable Experience.
           </p>
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <Link href="/hotels" className="btn-gold px-10 py-4 w-56 text-center text-xs tracking-[0.2em] font-sans">
               Explore Hotels
             </Link>
-            <Link href="/hotels" className="btn-outline-gold px-10 py-4 w-56 text-center text-xs tracking-[0.2em] font-sans">
+            <Link href="/hotels" className="border border-white/30 text-white bg-black/20 backdrop-blur-sm hover:bg-white hover:text-black hover:border-white transition-all duration-500 px-10 py-4 w-56 text-center text-xs tracking-[0.2em] font-sans uppercase font-medium">
               Book Your Stay
             </Link>
           </div>
         </div>
-
         {/* Scroll Indicator */}
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center space-y-2">
-          <span className="text-[0.65rem] tracking-[0.3em] uppercase text-luxury-silver/80">
+          <span className="text-[0.65rem] tracking-[0.3em] uppercase text-[#E5D4BC]/70 drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)] font-light">
             Scroll To Discover
           </span>
           <div className="w-[1px] h-12 bg-gradient-to-b from-luxury-gold to-transparent animate-pulse" />

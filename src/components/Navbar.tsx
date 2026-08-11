@@ -21,6 +21,13 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const hasHeroHeader =
+    pathname === "/" ||
+    pathname === "/about" ||
+    pathname === "/dining" ||
+    pathname === "/spa" ||
+    pathname === "/weddings" ||
+    (pathname.startsWith("/hotels/") && pathname !== "/hotels");
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [mounted, setMounted] = useState(false);
 
@@ -69,7 +76,9 @@ export default function Navbar() {
   const activeLinkStyle = (href: string) => {
     if (href === "/" && pathname === "/") return "text-luxury-gold";
     if (href !== "/" && pathname.startsWith(href)) return "text-luxury-gold";
-    return "text-luxury-ivory/80 hover:text-luxury-gold";
+    return hasHeroHeader && !scrolled
+      ? "text-white/80 hover:text-luxury-gold"
+      : "text-luxury-ivory/80 hover:text-luxury-gold";
   };
 
   return (
@@ -87,7 +96,9 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="group flex flex-col">
-            <span className="font-serif text-xl tracking-[0.25em] text-luxury-ivory group-hover:text-luxury-gold transition-colors duration-300">
+            <span className={`font-serif text-xl tracking-[0.25em] transition-colors duration-300 group-hover:text-luxury-gold ${
+              hasHeroHeader && !scrolled ? "text-white" : "text-luxury-ivory"
+            }`}>
               EARLS GROUP
             </span>
             <span className="text-[0.6rem] tracking-[0.45em] text-luxury-gold text-center uppercase">
@@ -114,11 +125,15 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center lg:space-x-3 xl:space-x-5">
             <button
               onClick={toggleTheme}
-              className="p-2 text-luxury-ivory hover:text-luxury-gold transition-colors duration-300 focus:outline-none cursor-pointer flex items-center justify-center"
+              className={`p-2 hover:text-luxury-gold transition-colors duration-300 focus:outline-none cursor-pointer flex items-center justify-center ${
+                hasHeroHeader && !scrolled ? "text-white" : "text-luxury-ivory"
+              }`}
               aria-label="Toggle Dark Mode"
             >
               {!mounted ? (
-                <div className="w-5 h-5 animate-pulse rounded-full bg-luxury-ivory/10" />
+                <div className={`w-5 h-5 animate-pulse rounded-full ${
+                  hasHeroHeader && !scrolled ? "bg-white/10" : "bg-luxury-ivory/10"
+                }`} />
               ) : theme === "dark" ? (
                 <Sun size={18} className="text-luxury-gold animate-[spin_10s_linear_infinite]" />
               ) : (
@@ -127,7 +142,9 @@ export default function Navbar() {
             </button>
             <Link
               href="/admin"
-              className="text-xs text-luxury-ivory/60 hover:text-luxury-gold transition-colors duration-300 font-sans uppercase tracking-widest"
+              className={`text-xs transition-colors duration-300 font-sans uppercase tracking-widest ${
+                hasHeroHeader && !scrolled ? "text-white/60 hover:text-luxury-gold" : "text-luxury-ivory/60 hover:text-luxury-gold"
+              }`}
             >
               Portal
             </Link>
@@ -140,11 +157,15 @@ export default function Navbar() {
           <div className="flex lg:hidden items-center space-x-3">
             <button
               onClick={toggleTheme}
-              className="p-2 text-luxury-ivory hover:text-luxury-gold transition-colors duration-300 focus:outline-none cursor-pointer flex items-center justify-center"
+              className={`p-2 hover:text-luxury-gold transition-colors duration-300 focus:outline-none cursor-pointer flex items-center justify-center ${
+                hasHeroHeader && !scrolled ? "text-white" : "text-luxury-ivory"
+              }`}
               aria-label="Toggle Dark Mode"
             >
               {!mounted ? (
-                <div className="w-5 h-5 animate-pulse rounded-full bg-luxury-ivory/10" />
+                <div className={`w-5 h-5 animate-pulse rounded-full ${
+                  hasHeroHeader && !scrolled ? "bg-white/10" : "bg-luxury-ivory/10"
+                }`} />
               ) : theme === "dark" ? (
                 <Sun size={18} className="text-luxury-gold animate-[spin_10s_linear_infinite]" />
               ) : (
@@ -153,7 +174,9 @@ export default function Navbar() {
             </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 text-luxury-ivory hover:text-luxury-gold transition-colors focus:outline-none"
+              className={`p-2 hover:text-luxury-gold transition-colors focus:outline-none ${
+                hasHeroHeader && !scrolled ? "text-white" : "text-luxury-ivory"
+              }`}
               aria-label="Toggle Menu"
             >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
