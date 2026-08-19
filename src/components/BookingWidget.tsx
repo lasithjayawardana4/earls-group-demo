@@ -19,6 +19,8 @@ interface BookingWidgetProps {
   rooms: any[];
   selectedRoomSlug: string;
   onSelectRoomSlug: (slug: string) => void;
+  initialCheckIn?: string;
+  initialCheckOut?: string;
 }
 
 export default function BookingWidget({
@@ -26,10 +28,12 @@ export default function BookingWidget({
   rooms,
   selectedRoomSlug,
   onSelectRoomSlug,
+  initialCheckIn,
+  initialCheckOut,
 }: BookingWidgetProps) {
   const router = useRouter();
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
+  const [checkIn, setCheckIn] = useState(initialCheckIn || "");
+  const [checkOut, setCheckOut] = useState(initialCheckOut || "");
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
   const [promoCode, setPromoCode] = useState("");
@@ -40,18 +44,88 @@ export default function BookingWidget({
   const [visitorType, setVisitorType] = useState<"local" | "international">("local");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isRoomAvailable, setIsRoomAvailable] = useState(true);
+  const [availableCount, setAvailableCount] = useState<number | null>(null);
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
 
-  // Default dates: checkin = tomorrow, checkout = day after tomorrow
+  // Default dates: checkin = tomorrow, checkout = day after tomorrow if not provided
   useEffect(() => {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-    const dayAfter = new Date(tomorrow);
-    dayAfter.setDate(tomorrow.getDate() + 2);
+    if (!checkIn || !checkOut) {
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      const dayAfter = new Date(tomorrow);
+      dayAfter.setDate(tomorrow.getDate() + 2);
 
-    setCheckIn(tomorrow.toISOString().split("T")[0]);
-    setCheckOut(dayAfter.toISOString().split("T")[0]);
-  }, []);
+      setCheckIn(tomorrow.toISOString().split("T")[0]);
+      setCheckOut(dayAfter.toISOString().split("T")[0]);
+    }
+  }, [checkIn, checkOut]);
+
+  // Query live availability when dates or selected room changes
+  useEffect(() => {
+    if (!checkIn || !checkOut) return;
+
+    if (new Date(checkIn) >= new Date(checkOut)) {
+      setIsRoomAvailable(true);
+      setAvailableCount(null);
+      return;
+    }
+
+    let active = true;
+
+    async function checkAvailability() {
+      setCheckingAvailability(true);
+      try {
+        const res = await fetch(`/api/availability?checkIn=${checkIn}&checkOut=${checkOut}`);
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || `Failed to fetch availability (status ${res.status})`);
+        }
+        const data = await res.json();
+        
+        if (!active) return;
+
+        // Map room slug to roomTypeCode
+        let roomTypeCode = "DELUXE";
+        if (selectedRoomSlug === "deluxe-room") {
+          roomTypeCode = "DELUXE";
+        } else if (selectedRoomSlug === "premier-room") {
+          roomTypeCode = "PREMIER";
+        } else if (selectedRoomSlug === "executive-suite") {
+          roomTypeCode = "EXECUTIVE_SUITE";
+        } else if (selectedRoomSlug === "presidential-villa") {
+          roomTypeCode = "PRESIDENTIAL_VILLA";
+        }
+
+        const roomAvail = data.rooms?.find((r: any) => r.roomTypeCode === roomTypeCode);
+        if (roomAvail) {
+          setIsRoomAvailable(roomAvail.isAvailable && roomAvail.available > 0);
+          setAvailableCount(roomAvail.available);
+        } else {
+          // Default to available for other types not in Earls Regent's core list
+          setIsRoomAvailable(true);
+          setAvailableCount(null);
+        }
+      } catch (err) {
+        console.error("Availability check error:", err);
+        if (active) {
+          setIsRoomAvailable(true); // Fallback: allow checkout on network/server error to avoid blocking guest
+          setAvailableCount(null);
+        }
+      } finally {
+        if (active) {
+          setCheckingAvailability(false);
+        }
+      }
+    }
+
+    checkAvailability();
+
+    return () => {
+      active = false;
+    };
+  }, [checkIn, checkOut, selectedRoomSlug]);
 
   const activeRoom = rooms.find((r) => r.slug === selectedRoomSlug) || rooms[0];
 
@@ -371,13 +445,37 @@ export default function BookingWidget({
           </div>
         </div>
 
+        {/* Availability status message */}
+        {checkIn && checkOut && (
+          <div className="mt-4 p-3 rounded-lg border text-xs flex justify-between items-center transition-all duration-300 bg-zinc-50 border-zinc-150">
+            <span className="text-zinc-500 tracking-wider uppercase font-medium">Availability Status:</span>
+            {checkingAvailability ? (
+              <span className="flex items-center text-luxury-gold-dark font-mono uppercase tracking-widest gap-1.5 font-semibold">
+                <Loader size={11} className="animate-spin" /> Checking...
+              </span>
+            ) : isRoomAvailable ? (
+              <span className="text-emerald-600 font-mono uppercase tracking-widest font-semibold">
+                Available {availableCount !== null && `(${availableCount} left)`}
+              </span>
+            ) : (
+              <span className="text-red-500 font-mono uppercase tracking-widest font-semibold">
+                Fully Booked
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Submit */}
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !isRoomAvailable || checkingAvailability}
           className="w-full py-3.5 mt-6 flex items-center justify-center space-x-2 text-xs font-sans tracking-[0.2em] text-white bg-gradient-to-r from-luxury-gold via-luxury-gold-light to-luxury-gold border-none rounded-lg hover:shadow-[0_4px_20px_rgba(158,116,40,0.25)] transition-all duration-500 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
         >
-          {loading ? (
+          {checkingAvailability ? (
+            <span>CHECKING AVAILABILITY...</span>
+          ) : !isRoomAvailable ? (
+            <span>NOT AVAILABLE FOR SELECTED DATES</span>
+          ) : loading ? (
             <>
               <Loader size={14} className="animate-spin" />
               <span>CONFIRMING...</span>

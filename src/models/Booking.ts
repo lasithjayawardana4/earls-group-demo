@@ -15,6 +15,7 @@ export interface IBooking extends Document {
   specialRequests?: string;
   promoCode?: string;
   visitorType: "local" | "international";
+  reservationNumber?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -44,6 +45,7 @@ const BookingSchema: Schema = new Schema(
       required: true,
       default: "local",
     },
+    reservationNumber: { type: String },
   },
   { timestamps: true }
 );

@@ -62,7 +62,8 @@ const RoomSchema = new mongoose.Schema({
   },
   price: { type: Number, required: true },
   amenities: [{ type: String }],
-  images: [{ type: String }]
+  images: [{ type: String }],
+  video: { type: String }
 }, { timestamps: true });
 
 const RestaurantSchema = new mongoose.Schema({

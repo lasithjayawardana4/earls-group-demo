@@ -112,6 +112,11 @@ export default function BookingConfirmationPage({ params }: Props) {
           <p className="text-xs tracking-widest text-luxury-gold uppercase font-mono">
             Booking Reference: {booking._id}
           </p>
+          {booking.reservationNumber && (
+            <p className="text-sm tracking-[0.15em] text-luxury-gold uppercase font-mono mt-1">
+              Earls Hotels Confirmation Code: <span className="font-bold text-luxury-ivory text-base bg-luxury-gold/10 px-3 py-1 rounded border border-luxury-gold/30">{booking.reservationNumber}</span>
+            </p>
+          )}
         </div>
 
         {/* Receipt / Invoice Details */}

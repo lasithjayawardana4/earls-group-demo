@@ -14,7 +14,8 @@ import {
   ChevronRight,
   X,
   Award,
-  ChevronDown
+  ChevronDown,
+  Loader
 } from "lucide-react";
 import BookingWidget from "./BookingWidget";
 import { motion, AnimatePresence } from "framer-motion";
@@ -37,6 +38,13 @@ export default function HotelDetailCoordinator({
 
   const searchParams = useSearchParams();
   const roomParam = searchParams.get("room");
+  const urlCheckIn = searchParams.get("checkIn");
+  const urlCheckOut = searchParams.get("checkOut");
+
+  const [checkIn, setCheckIn] = useState(urlCheckIn || "");
+  const [checkOut, setCheckOut] = useState(urlCheckOut || "");
+  const [availability, setAvailability] = useState<any[]>([]);
+  const [isFetchingAvail, setIsFetchingAvail] = useState(false);
 
   useEffect(() => {
     if (roomParam && rooms.some((r) => r.slug === roomParam)) {
@@ -47,6 +55,73 @@ export default function HotelDetailCoordinator({
       }
     }
   }, [roomParam, rooms]);
+
+  // Initialize search dates and query availability
+  useEffect(() => {
+    let defaultIn = urlCheckIn || "";
+    let defaultOut = urlCheckOut || "";
+
+    if (!defaultIn || !defaultOut) {
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      const dayAfter = new Date(tomorrow);
+      dayAfter.setDate(tomorrow.getDate() + 2);
+
+      defaultIn = tomorrow.toISOString().split("T")[0];
+      defaultOut = dayAfter.toISOString().split("T")[0];
+    }
+
+    setCheckIn(defaultIn);
+    setCheckOut(defaultOut);
+    fetchLiveAvailability(defaultIn, defaultOut);
+  }, [urlCheckIn, urlCheckOut]);
+
+  const fetchLiveAvailability = async (ci: string, co: string) => {
+    if (!ci || !co) return;
+    if (new Date(ci) >= new Date(co)) {
+      setAvailability([]);
+      return;
+    }
+    setIsFetchingAvail(true);
+    try {
+      const res = await fetch(`/api/availability?checkIn=${ci}&checkOut=${co}`);
+      if (res.ok) {
+        const data = await res.json();
+        setAvailability(data.rooms || []);
+      }
+    } catch (e) {
+      console.error("Failed to fetch availability:", e);
+    } finally {
+      setIsFetchingAvail(false);
+    }
+  };
+
+  const handleDateChange = (type: "in" | "out", value: string) => {
+    if (type === "in") {
+      setCheckIn(value);
+      if (checkOut && new Date(value) >= new Date(checkOut)) {
+        const nextDay = new Date(value);
+        nextDay.setDate(nextDay.getDate() + 1);
+        const nextDayStr = nextDay.toISOString().split("T")[0];
+        setCheckOut(nextDayStr);
+        fetchLiveAvailability(value, nextDayStr);
+      } else {
+        fetchLiveAvailability(value, checkOut);
+      }
+    } else {
+      setCheckOut(value);
+      fetchLiveAvailability(checkIn, value);
+    }
+  };
+
+  const getRoomTypeCode = (slug: string) => {
+    if (slug === "deluxe-room") return "DELUXE";
+    if (slug === "premier-room") return "PREMIER";
+    if (slug === "executive-suite") return "EXECUTIVE_SUITE";
+    if (slug === "presidential-villa") return "PRESIDENTIAL_VILLA";
+    return "EXECUTIVE_SUITE";
+  };
 
   // Open booking modal
   const handleReserveRoom = (roomSlug: string) => {
@@ -68,13 +143,37 @@ export default function HotelDetailCoordinator({
 
         {/* Room Types Listing */}
         <section id="rooms" className="space-y-10">
-          <div className="border-b border-luxury-gold/15 pb-4">
-            <h3 className="font-serif text-3xl text-luxury-ivory tracking-wide">
-              Suites &amp; Villas
-            </h3>
-            <p className="text-xs text-luxury-gold tracking-widest uppercase mt-1">
-              Select your private living quarters
-            </p>
+          <div className="border-b border-luxury-gold/15 pb-4 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+            <div>
+              <h3 className="font-serif text-3xl text-luxury-ivory tracking-wide">
+                Suites &amp; Villas
+              </h3>
+              <p className="text-xs text-luxury-gold tracking-widest uppercase mt-1">
+                Select your private living quarters
+              </p>
+            </div>
+
+            {/* Dynamic Date Search Component */}
+            <div className="flex flex-wrap items-center gap-3 bg-luxury-charcoal/30 border border-luxury-gold/10 p-3 rounded-lg gold-glow max-w-md">
+              <div className="flex-1 min-w-[120px]">
+                <label className="block text-[0.55rem] tracking-[0.15em] text-luxury-gold uppercase mb-1 font-sans font-medium">Check-In</label>
+                <input
+                  type="date"
+                  value={checkIn}
+                  onChange={(e) => handleDateChange("in", e.target.value)}
+                  className="w-full bg-luxury-black border border-luxury-gold/15 py-1 px-2 text-[0.7rem] text-luxury-ivory focus:outline-none focus:border-luxury-gold/50 cursor-pointer uppercase tracking-wider"
+                />
+              </div>
+              <div className="flex-1 min-w-[120px]">
+                <label className="block text-[0.55rem] tracking-[0.15em] text-luxury-gold uppercase mb-1 font-sans font-medium">Check-Out</label>
+                <input
+                  type="date"
+                  value={checkOut}
+                  onChange={(e) => handleDateChange("out", e.target.value)}
+                  className="w-full bg-luxury-black border border-luxury-gold/15 py-1 px-2 text-[0.7rem] text-luxury-ivory focus:outline-none focus:border-luxury-gold/50 cursor-pointer uppercase tracking-wider"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="space-y-12">
@@ -98,11 +197,38 @@ export default function HotelDetailCoordinator({
                 {/* Room Specs */}
                 <div className="p-8 flex-grow flex flex-col justify-between">
                   <div>
-                    <div className="flex justify-between items-start mb-2 gap-4">
+                    <div className="flex justify-between items-start mb-2 gap-4 flex-wrap">
                       <h4 className="font-serif text-2xl text-luxury-ivory group-hover:text-luxury-gold transition-colors duration-300">
                         {room.name}
                       </h4>
-                      <div className="text-right" />
+                      {(() => {
+                        const code = getRoomTypeCode(room.slug);
+                        const avail = availability.find((a) => a.roomTypeCode === code);
+                        if (!avail) return null;
+                        if (isFetchingAvail) {
+                          return (
+                            <span className="text-[0.65rem] uppercase font-mono tracking-widest text-luxury-gold/50 animate-pulse mt-2">
+                              Updating status...
+                            </span>
+                          );
+                        }
+                        if (!avail.isAvailable || avail.available <= 0) {
+                          return (
+                            <span className="text-[0.65rem] uppercase font-mono tracking-widest text-red-400 font-bold bg-red-950/20 px-2.5 py-1 border border-red-500/25 mt-2 rounded">
+                              Fully Booked
+                            </span>
+                          );
+                        }
+                        return (
+                          <span className={`text-[0.65rem] uppercase font-mono tracking-widest px-2.5 py-1 border rounded mt-2 ${
+                            avail.available <= 5 
+                              ? "text-red-400 border-red-500/20 bg-red-950/15 font-bold animate-pulse" 
+                              : "text-emerald-400 border-emerald-500/20 bg-emerald-950/15"
+                          }`}>
+                            Only {avail.available} rooms left!
+                          </span>
+                        );
+                      })()}
                     </div>
 
                     <p className="text-xs text-luxury-ivory/60 font-light leading-relaxed mb-6">
@@ -143,12 +269,20 @@ export default function HotelDetailCoordinator({
                     >
                       EXPLORE ROOM
                     </Link>
-                    <button
-                      onClick={() => handleReserveRoom(room.slug)}
-                      className="btn-gold w-full px-8 py-3 text-center text-xs tracking-widest font-sans"
-                    >
-                      SELECT &amp; BOOK
-                    </button>
+                    {(() => {
+                      const code = getRoomTypeCode(room.slug);
+                      const avail = availability.find((a) => a.roomTypeCode === code);
+                      const isFullyBooked = avail && (!avail.isAvailable || avail.available <= 0);
+                      return (
+                        <button
+                          onClick={() => handleReserveRoom(room.slug)}
+                          disabled={isFullyBooked}
+                          className="btn-gold w-full px-8 py-3 text-center text-xs tracking-widest font-sans uppercase disabled:opacity-50 disabled:pointer-events-none"
+                        >
+                          {isFullyBooked ? "Fully Booked" : "SELECT & BOOK"}
+                        </button>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>
@@ -386,6 +520,8 @@ export default function HotelDetailCoordinator({
                   rooms={rooms}
                   selectedRoomSlug={selectedRoomSlug}
                   onSelectRoomSlug={(slug) => setSelectedRoomSlug(slug)}
+                  initialCheckIn={checkIn}
+                  initialCheckOut={checkOut}
                 />
               </motion.div>
             </div>
