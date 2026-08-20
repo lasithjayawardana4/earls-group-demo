@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import mongoose from "mongoose";
 import dbConnect from "@/lib/dbConnect";
 import Booking from "@/models/Booking";
 import Hotel from "@/models/Hotel";
@@ -28,14 +29,38 @@ export default async function AdminPage() {
       .populate("room")
       .sort({ createdAt: -1 })
       .lean();
+
+    // If bookings collection is empty, read from shared reservations collection
+    if (!dbBookings || dbBookings.length === 0) {
+      const rawReservations = await mongoose.connection.db?.collection("reservations").find({}).sort({ createdAt: -1 }).toArray();
+      if (rawReservations && rawReservations.length > 0) {
+        dbBookings = rawReservations.map((r: any) => ({
+          _id: r.reservationNumber || r._id.toString(),
+          reservationNumber: r.reservationNumber,
+          guestName: r.guest?.name || "Guest",
+          email: r.guest?.email || "",
+          phone: r.guest?.phone || "",
+          hotel: { name: r.hotelCode === "regent" ? "Earl's Regent Kandy" : r.hotelCode, location: "Kandy" },
+          room: { name: r.roomTypeCode || "Deluxe Room" },
+          adults: r.adults || 2,
+          children: r.children || 0,
+          checkIn: r.checkIn,
+          checkOut: r.checkOut,
+          price: r.totalAmount || 0,
+          specialRequests: r.specialRequests || "",
+          bookingStatus: r.status === "CONFIRMED" ? "Confirmed" : r.status || "Confirmed",
+          createdAt: r.createdAt || new Date(),
+        }));
+      }
+    }
     
     dbHotels = await Hotel.find({}).lean();
     
     // Stringify ObjectIds
     dbBookings = JSON.parse(JSON.stringify(dbBookings));
     dbHotels = JSON.parse(JSON.stringify(dbHotels));
-  } catch (err) {
-    console.warn("MongoDB fetch failed for Admin Dashboard, displaying empty list or mock fallbacks.");
+  } catch (err: any) {
+    console.error("Admin Dashboard fetch error:", err?.message || err);
   }
 
   // Fetch hotels through getHotels as fallback
