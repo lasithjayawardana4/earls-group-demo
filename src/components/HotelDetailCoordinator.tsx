@@ -187,7 +187,7 @@ export default function HotelDetailCoordinator({
                 {/* Room Image */}
                 <div className="relative w-full md:w-[420px] h-64 md:h-auto overflow-hidden">
                   <Image
-                    src={room.images[0] || hotel.images[0]}
+                    src={room.images?.[0] || hotel.images?.[0] || "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80"}
                     alt={room.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-700 filter brightness-95"

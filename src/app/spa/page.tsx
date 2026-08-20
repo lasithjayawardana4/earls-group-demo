@@ -71,7 +71,7 @@ export default async function SpaPage() {
                 {/* Photo */}
                 <div className="relative h-60 overflow-hidden">
                   <Image
-                    src={treatment.images[0]}
+                    src={treatment.images?.[0] || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80"}
                     alt={treatment.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-[1.2s] filter brightness-95"
