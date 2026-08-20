@@ -1,131 +1,67 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
-import Booking from "@/models/Booking";
 import Hotel from "@/models/Hotel";
 import Room from "@/models/Room";
 import { MOCK_HOTELS, MOCK_ROOMS } from "@/lib/mockData";
 
-// Simple local in-memory database of mock bookings for demo fallback
+// Simple local in-memory database of bookings for demo fallback & confirmation retrieval
 const mockBookingsDb: Record<string, any> = {};
 
-async function syncBookingToDashboard(bookingData: {
-  hotelId: string;
-  roomId: string;
-  checkIn: string | Date;
-  checkOut: string | Date;
-  adults: number;
-  children: number;
-  price: number;
-  specialRequests?: string;
-  guestName: string;
-  email?: string;
-  phone: string;
-  visitorType?: "local" | "international";
-}) {
+const pushBookingToDashboard = async (bookingDetails: {
+  hotelCode?: string;
+  roomType: string;
+  checkInDate: string;
+  checkOutDate: string;
+  adultsCount: number;
+  childrenCount: number;
+  totalPrice: number;
+  customerNotes?: string;
+  customerName: string;
+  customerEmail?: string;
+  customerPhone?: string;
+  customerCountry?: string;
+}) => {
+  const dashboardUrl = process.env.CENTRAL_DASHBOARD_API_URL || "https://booking-system-jet-kappa.vercel.app/api/public/bookings";
+
+  const payload = {
+    hotelCode: bookingDetails.hotelCode || "regent", // Always "regent" for Earl's Regent Hotel
+    roomTypeCode: bookingDetails.roomType, // E.g., "DELUXE", "EXECUTIVE_SUITE", "PREMIER", or "PRESIDENTIAL_VILLA"
+    checkIn: bookingDetails.checkInDate, // Format: "YYYY-MM-DD"
+    checkOut: bookingDetails.checkOutDate, // Format: "YYYY-MM-DD"
+    adults: bookingDetails.adultsCount || 2,
+    children: bookingDetails.childrenCount || 0,
+    rooms: 1,
+    totalAmount: bookingDetails.totalPrice, // Number value (e.g., 220)
+    currency: "USD",
+    specialRequests: bookingDetails.customerNotes || "",
+    guest: {
+      name: bookingDetails.customerName,
+      email: bookingDetails.customerEmail || "anonymous@earlshotels.com",
+      phone: bookingDetails.customerPhone || "",
+      country: bookingDetails.customerCountry || "Sri Lanka",
+    },
+  };
+
   try {
-    // 1. Resolve hotel details
-    let hotelSlug = "";
-    try {
-      await dbConnect();
-      const hotelObj = await Hotel.findById(bookingData.hotelId);
-      if (hotelObj) {
-        hotelSlug = hotelObj.slug;
-      }
-    } catch (e) {
-      console.warn("MongoDB hotel resolution failed, trying mock fallback");
-    }
-
-    if (!hotelSlug) {
-      const mockHotel = MOCK_HOTELS.find((h) => h._id === bookingData.hotelId);
-      if (mockHotel) {
-        hotelSlug = mockHotel.slug;
-      }
-    }
-
-    // 2. Resolve room details
-    let roomSlug = "";
-    try {
-      const roomObj = await Room.findById(bookingData.roomId);
-      if (roomObj) {
-        roomSlug = roomObj.slug;
-      }
-    } catch (e) {
-      console.warn("MongoDB room resolution failed, trying mock fallback");
-    }
-
-    if (!roomSlug) {
-      const mockRoom = MOCK_ROOMS.find((r) => r._id === bookingData.roomId);
-      if (mockRoom) {
-        roomSlug = mockRoom.slug;
-      }
-    }
-
-    // 3. Map Codes
-    // Always "regent" for Earl's Regent Hotel
-    const hotelCode = hotelSlug && hotelSlug.includes("regent") ? "regent" : "regent";
-
-    // roomTypeCode: Must map to: "DELUXE", "PREMIER", "EXECUTIVE_SUITE", or "PRESIDENTIAL_VILLA"
-    let roomTypeCode = "DELUXE";
-    if (roomSlug === "deluxe-room") {
-      roomTypeCode = "DELUXE";
-    } else if (roomSlug === "premier-room") {
-      roomTypeCode = "PREMIER";
-    } else if (roomSlug === "executive-suite") {
-      roomTypeCode = "EXECUTIVE_SUITE";
-    } else if (roomSlug === "presidential-villa") {
-      roomTypeCode = "PRESIDENTIAL_VILLA";
-    }
-
-    // Format dates
-    const checkInStr = new Date(bookingData.checkIn).toISOString().split("T")[0];
-    const checkOutStr = new Date(bookingData.checkOut).toISOString().split("T")[0];
-
-    const dashboardApiUrl = process.env.CENTRAL_DASHBOARD_API_URL || "http://localhost:3000/api/public/bookings";
-    const bearerToken = "earls_website_secure_token_2026";
-
-    const payload = {
-      hotelCode,
-      roomTypeCode,
-      checkIn: checkInStr,
-      checkOut: checkOutStr,
-      adults: bookingData.adults || 2,
-      children: bookingData.children || 0,
-      rooms: 1,
-      totalAmount: bookingData.price,
-      currency: "USD",
-      specialRequests: bookingData.specialRequests || "",
-      guest: {
-        name: bookingData.guestName,
-        email: bookingData.email || "anonymous@earlshotels.com",
-        phone: bookingData.phone || "+94-77-1234567",
-        country: bookingData.visitorType === "international" ? "International" : "Sri Lanka",
-      },
-    };
-
-    console.log("Sending booking synchronization to Central Reservation Dashboard:", payload);
-
-    const response = await fetch(dashboardApiUrl, {
+    const response = await fetch(dashboardUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${bearerToken}`,
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Dashboard API returned status ${response.status}: ${errorText}`);
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Dashboard sync success! Reference:", data.reservationNumber);
+      return data;
+    } else {
+      console.error("Dashboard refused sync:", await response.text());
+      return null;
     }
-
-    const data = await response.json();
-    console.log("Central Reservation Dashboard sync success:", data);
-    return data.reservationNumber;
-  } catch (error) {
-    console.error("Failed to sync booking to dashboard:", error);
+  } catch (err) {
+    console.error("Failed to connect to dashboard API:", err);
     return null;
   }
-}
+};
 
 export async function POST(req: Request) {
   try {
@@ -151,122 +87,149 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Missing check-in or check-out date" }, { status: 400 });
     }
 
+    const checkInStr = new Date(checkIn).toISOString().split("T")[0];
+    const checkOutStr = new Date(checkOut).toISOString().split("T")[0];
+
+    // Resolve room details and slug
+    let roomSlug = "";
+    let roomName = "Selected Room";
+    try {
+      await dbConnect();
+      const roomObj = await Room.findById(roomId);
+      if (roomObj) {
+        roomSlug = roomObj.slug;
+        roomName = roomObj.name;
+      }
+    } catch (e) {}
+
+    if (!roomSlug) {
+      const mockRoom = MOCK_ROOMS.find((r) => r._id === roomId);
+      if (mockRoom) {
+        roomSlug = mockRoom.slug;
+        roomName = mockRoom.name;
+      }
+    }
+
+    // Resolve hotel details and slug
+    let hotelSlug = "";
+    let hotelName = "Earl's Regent Hotel";
+    let hotelLocation = "Kandy, Sri Lanka";
+    try {
+      const hotelObj = await Hotel.findById(hotelId);
+      if (hotelObj) {
+        hotelSlug = hotelObj.slug;
+        hotelName = hotelObj.name;
+        hotelLocation = hotelObj.location;
+      }
+    } catch (e) {}
+
+    if (!hotelSlug) {
+      const mockHotel = MOCK_HOTELS.find((h) => h._id === hotelId);
+      if (mockHotel) {
+        hotelSlug = mockHotel.slug;
+        hotelName = mockHotel.name;
+        hotelLocation = mockHotel.location;
+      }
+    }
+
+    // Map room slug to official roomTypeCode
+    let roomTypeCode = "DELUXE";
+    if (roomSlug === "deluxe-room") {
+      roomTypeCode = "DELUXE";
+    } else if (roomSlug === "premier-room") {
+      roomTypeCode = "PREMIER";
+    } else if (roomSlug === "executive-suite") {
+      roomTypeCode = "EXECUTIVE_SUITE";
+    } else if (roomSlug === "presidential-villa") {
+      roomTypeCode = "PRESIDENTIAL_VILLA";
+    }
+
     // Server-Side Availability Check before checkout
     try {
-      const checkInStr = new Date(checkIn).toISOString().split("T")[0];
-      const checkOutStr = new Date(checkOut).toISOString().split("T")[0];
-      const dashboardUrl = process.env.CENTRAL_DASHBOARD_API_URL || "http://localhost:3000/api/public/bookings";
+      const dashboardUrl = process.env.CENTRAL_DASHBOARD_API_URL || "https://booking-system-jet-kappa.vercel.app/api/public/bookings";
       const availabilityUrl = dashboardUrl.replace("/bookings", "/availability");
 
       const availRes = await fetch(`${availabilityUrl}?checkIn=${checkInStr}&checkOut=${checkOutStr}`);
       if (availRes.ok) {
         const availData = await availRes.json();
-        
-        // Resolve roomTypeCode for requested room
-        let roomSlug = "";
-        try {
-          const roomObj = await Room.findById(roomId);
-          if (roomObj) roomSlug = roomObj.slug;
-        } catch (e) {}
-        if (!roomSlug) {
-          const mockRoom = MOCK_ROOMS.find((r) => r._id === roomId);
-          if (mockRoom) roomSlug = mockRoom.slug;
-        }
-
-        let roomTypeCode = "DELUXE";
-        if (roomSlug === "deluxe-room") {
-          roomTypeCode = "DELUXE";
-        } else if (roomSlug === "premier-room") {
-          roomTypeCode = "PREMIER";
-        } else if (roomSlug === "executive-suite") {
-          roomTypeCode = "EXECUTIVE_SUITE";
-        } else if (roomSlug === "presidential-villa") {
-          roomTypeCode = "PRESIDENTIAL_VILLA";
-        }
-
         const roomAvail = availData.rooms?.find((r: any) => r.roomTypeCode === roomTypeCode);
         if (roomAvail && (!roomAvail.isAvailable || roomAvail.available <= 0)) {
           return NextResponse.json({
             success: false,
-            error: `The selected quarters (${roomAvail.roomTypeName}) is fully booked for the selected dates. Please choose another quarters or date range.`
+            error: `The selected quarters (${roomAvail.roomTypeName || roomName}) is fully booked for the selected dates. Please choose another quarters or date range.`
           }, { status: 400 });
         }
       }
     } catch (availErr) {
-      console.warn("Failed to perform server-side availability check, continuing as fallback:", availErr);
+      console.warn("Failed to perform server-side availability check, continuing:", availErr);
     }
 
-    try {
-      await dbConnect();
-      
-      const newBooking = await Booking.create({
-        guestName,
-        email,
-        phone,
-        hotel: hotelId,
-        room: roomId,
-        adults,
-        children,
-        checkIn: new Date(checkIn),
-        checkOut: new Date(checkOut),
-        price,
-        specialRequests,
-        promoCode,
-        visitorType: visitorType || "local",
-        bookingStatus: "Confirmed",
-      });
+    // Replace direct MongoDB write with Dashboard API Call
+    const dashboardResult = await pushBookingToDashboard({
+      hotelCode: "regent",
+      roomType: roomTypeCode,
+      checkInDate: checkInStr,
+      checkOutDate: checkOutStr,
+      adultsCount: adults || 2,
+      childrenCount: children || 0,
+      totalPrice: price,
+      customerNotes: specialRequests || "",
+      customerName: guestName,
+      customerEmail: email,
+      customerPhone: phone || "",
+      customerCountry: visitorType === "international" ? "International" : "Sri Lanka",
+    });
 
-      // Directly after saving, trigger sync to Central Dashboard
-      const reservationNumber = await syncBookingToDashboard(body);
-      if (reservationNumber) {
-        newBooking.reservationNumber = reservationNumber;
-        await newBooking.save();
-      }
-
+    if (!dashboardResult || !dashboardResult.reservationNumber) {
       return NextResponse.json({
-        success: true,
-        booking: newBooking,
-        message: "Booking saved in MongoDB",
-      });
-    } catch (dbErr) {
-      console.warn("MongoDB write failed, creating mock booking in-memory fallback.");
-      
-      // Fallback: create in-memory mock booking
-      const mockId = `mock_bk_${Math.random().toString(36).substring(2, 10)}`;
-      const mockBooking: any = {
-        _id: mockId,
-        guestName,
-        email,
-        phone,
-        hotel: hotelId,
-        room: roomId,
-        adults,
-        children,
-        checkIn: new Date(checkIn),
-        checkOut: new Date(checkOut),
-        price,
-        specialRequests,
-        promoCode,
-        visitorType: visitorType || "local",
-        bookingStatus: "Confirmed",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      
-      // Directly after saving, trigger sync to Central Dashboard
-      const reservationNumber = await syncBookingToDashboard(body);
-      if (reservationNumber) {
-        mockBooking.reservationNumber = reservationNumber;
-      }
-
-      mockBookingsDb[mockId] = mockBooking;
-      
-      return NextResponse.json({
-        success: true,
-        booking: mockBooking,
-        message: "Booking created in temporary mock memory",
-      });
+        success: false,
+        error: "Failed to create reservation on Central Dashboard. Please try again.",
+      }, { status: 500 });
     }
+
+    const reservationNumber = dashboardResult.reservationNumber;
+    const reservationId = dashboardResult.reservationId || reservationNumber;
+
+    // Construct the booking record for client presentation
+    const bookingObj = {
+      _id: reservationNumber,
+      reservationNumber,
+      reservationId,
+      guestName,
+      email,
+      phone,
+      hotel: {
+        _id: hotelId,
+        name: hotelName,
+        location: hotelLocation,
+      },
+      room: {
+        _id: roomId,
+        name: roomName,
+      },
+      adults: adults || 2,
+      children: children || 0,
+      checkIn: new Date(checkIn),
+      checkOut: new Date(checkOut),
+      price,
+      specialRequests,
+      promoCode,
+      visitorType: visitorType || "local",
+      bookingStatus: "Confirmed",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    // Store in memory for confirmation page receipt retrieval
+    mockBookingsDb[reservationNumber] = bookingObj;
+    mockBookingsDb[reservationId] = bookingObj;
+
+    return NextResponse.json({
+      success: true,
+      booking: bookingObj,
+      reservationNumber,
+      message: "Direct Booking created successfully via Central Dashboard",
+    });
   } catch (error: any) {
     console.error("Booking API error:", error);
     return NextResponse.json({ success: false, error: error.message || "An error occurred" }, { status: 500 });
@@ -283,20 +246,10 @@ export async function GET(req: Request) {
       return NextResponse.json({ success: false, error: "Missing booking ID" }, { status: 400 });
     }
 
-    try {
-      await dbConnect();
-      const booking = await Booking.findById(id).populate("hotel").populate("room").lean();
-      if (booking) {
-        return NextResponse.json({ success: true, booking });
-      }
-    } catch (dbErr) {
-      console.warn("MongoDB read failed for booking, searching mock memory.");
-    }
-
-    // Check mock DB
-    const mockB = mockBookingsDb[id];
-    if (mockB) {
-      return NextResponse.json({ success: true, booking: mockB });
+    // Check memory cache
+    const cachedBooking = mockBookingsDb[id];
+    if (cachedBooking) {
+      return NextResponse.json({ success: true, booking: cachedBooking });
     }
 
     return NextResponse.json({ success: false, error: "Booking not found" }, { status: 404 });

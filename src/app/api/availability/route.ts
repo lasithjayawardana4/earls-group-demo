@@ -10,7 +10,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Missing checkIn or checkOut parameters" }, { status: 400 });
     }
 
-    const dashboardUrl = process.env.CENTRAL_DASHBOARD_API_URL || "http://localhost:3000/api/public/bookings";
+    const dashboardUrl = process.env.CENTRAL_DASHBOARD_API_URL || "https://booking-system-jet-kappa.vercel.app/api/public/bookings";
     // Construct the availability URL from the bookings URL
     const availabilityUrl = dashboardUrl.replace("/bookings", "/availability");
 
