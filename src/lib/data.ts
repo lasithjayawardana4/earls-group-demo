@@ -146,16 +146,7 @@ export async function getHotels(query: any = {}) {
   try {
     await dbConnect();
     const hotels = await Hotel.find(query).lean();
-    if (hotels && hotels.length > 0) {
-      const sanitized = JSON.parse(JSON.stringify(hotels)).map((h: any) => {
-        if (!h.images || !Array.isArray(h.images) || h.images.length === 0) {
-          const match = MOCK_HOTELS.find((m) => m.slug === h.slug || m._id === h._id);
-          h.images = match?.images || ["https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80"];
-        }
-        return h;
-      });
-      return sanitized;
-    }
+    if (hotels && hotels.length > 0) return JSON.parse(JSON.stringify(hotels));
   } catch (err) {
     console.warn("MongoDB connection failed or empty database, falling back to mock hotels.");
   }
@@ -173,14 +164,7 @@ export async function getHotelBySlug(slug: string) {
   try {
     await dbConnect();
     const hotel = await Hotel.findOne({ slug }).lean();
-    if (hotel) {
-      const h: any = JSON.parse(JSON.stringify(hotel));
-      if (!h.images || !Array.isArray(h.images) || h.images.length === 0) {
-        const match = MOCK_HOTELS.find((m) => m.slug === h.slug || m._id === h._id);
-        h.images = match?.images || ["https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80"];
-      }
-      return h;
-    }
+    if (hotel) return JSON.parse(JSON.stringify(hotel));
   } catch (err) {
     console.warn(`MongoDB query failed for hotel ${slug}, using mock.`);
   }
@@ -191,16 +175,7 @@ export async function getRoomsForHotel(hotelId: string) {
   try {
     await dbConnect();
     const rooms = await Room.find({ hotel: hotelId }).lean();
-    if (rooms && rooms.length > 0) {
-      const sanitized = JSON.parse(JSON.stringify(rooms)).map((r: any) => {
-        if (!r.images || !Array.isArray(r.images) || r.images.length === 0) {
-          const match = MOCK_ROOMS.find((m) => m.slug === r.slug || m._id === r._id);
-          r.images = match?.images || ["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80"];
-        }
-        return r;
-      });
-      return sanitized;
-    }
+    if (rooms && rooms.length > 0) return JSON.parse(JSON.stringify(rooms));
   } catch (err) {
     console.warn(`MongoDB query failed for rooms under hotelId ${hotelId}, using mock.`);
   }

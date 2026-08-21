@@ -131,7 +131,7 @@ export default function RoomDetailCoordinator({ hotel, room }: RoomDetailCoordin
             ) : (
               <div className="w-full h-full relative">
                 <Image
-                  src={room.images?.[0] || hotel.images?.[0] || "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80"}
+                  src={room.images[0] || hotel.images[0]}
                   alt={room.name}
                   fill
                   className="object-cover"

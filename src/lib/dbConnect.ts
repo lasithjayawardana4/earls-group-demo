@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
 
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/earls_group";
+
+if (!MONGODB_URI) {
+  throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
+}
+
 interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
@@ -16,25 +22,28 @@ if (!global.mongoose) {
   global.mongoose = cached;
 }
 
-async function dbConnect() {
-  const uri = process.env.MONGODB_URI || "mongodb+srv://lasithjayawardana4_db_user:dLiGYg2L38u2fsAD@cluster0.jxvyjj7.mongodb.net/earls_hotels?retryWrites=true&w=majority";
+// Keep track of the last failed attempt time to avoid consecutive timeout hangs
+let lastAttemptTime = 0;
+const RETRY_COOLDOWN = 15000; // 15 seconds cooldown
 
-  if (!uri) {
-    throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
+async function dbConnect() {
+  if (cached.conn) {
+    return cached.conn;
   }
 
-  if (cached.conn && mongoose.connection.readyState === 1) {
-    return cached.conn;
+  const now = Date.now();
+  if (now - lastAttemptTime < RETRY_COOLDOWN) {
+    throw new Error("MongoDB connection is in cooldown period after a recent failure.");
   }
 
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
-      serverSelectionTimeoutMS: 8000, // 8s timeout for serverless cold starts
-      connectTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 800, // Timeout connection after 800ms if MongoDB is offline
     };
 
-    cached.promise = mongoose.connect(uri, opts).then((mongooseInstance) => {
+    lastAttemptTime = now;
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongooseInstance) => {
       return mongooseInstance;
     });
   }
@@ -43,7 +52,8 @@ async function dbConnect() {
     cached.conn = await cached.promise;
   } catch (e) {
     cached.promise = null;
-    cached.conn = null;
+    // Update attempt time on failure to start the cooldown
+    lastAttemptTime = Date.now();
     throw e;
   }
 

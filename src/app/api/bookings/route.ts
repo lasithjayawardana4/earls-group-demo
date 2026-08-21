@@ -21,7 +21,7 @@ const pushBookingToDashboard = async (bookingDetails: {
   customerPhone?: string;
   customerCountry?: string;
 }) => {
-  const dashboardUrl = process.env.CENTRAL_DASHBOARD_API_URL || "https://booking-system-jet-kappa.vercel.app/api/public/bookings";
+  const dashboardUrl = process.env.CENTRAL_DASHBOARD_API_URL || "https://sri-plus-dashboard.vercel.app/api/public/bookings";
 
   const payload = {
     hotelCode: bookingDetails.hotelCode || "regent", // Always "regent" for Earl's Regent Hotel
@@ -42,14 +42,14 @@ const pushBookingToDashboard = async (bookingDetails: {
     },
   };
 
-  const apiKey = process.env.CENTRAL_DASHBOARD_API_KEY || "earls_website_secure_token_2026";
-
   try {
+    const apiKey = process.env.CENTRAL_DASHBOARD_API_KEY || "earls_website_secure_token_2026";
+
     const response = await fetch(dashboardUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify(payload),
     });
@@ -151,7 +151,7 @@ export async function POST(req: Request) {
 
     // Server-Side Availability Check before checkout
     try {
-      const dashboardUrl = process.env.CENTRAL_DASHBOARD_API_URL || "https://booking-system-jet-kappa.vercel.app/api/public/bookings";
+      const dashboardUrl = process.env.CENTRAL_DASHBOARD_API_URL || "https://sri-plus-dashboard.vercel.app/api/public/bookings";
       const availabilityUrl = dashboardUrl.replace("/bookings", "/availability");
 
       const availRes = await fetch(`${availabilityUrl}?checkIn=${checkInStr}&checkOut=${checkOutStr}`);

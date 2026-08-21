@@ -63,7 +63,7 @@ export default async function WeddingsPage() {
               {/* Photo */}
               <div className="relative w-full lg:w-1/2 h-96 overflow-hidden border border-luxury-gold/15">
                 <Image
-                  src={venue.images?.[0] || "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80"}
+                  src={venue.images[0]}
                   alt={venue.venueName}
                   fill
                   className="object-cover filter brightness-95 hover:scale-105 transition-transform duration-[1.5s]"

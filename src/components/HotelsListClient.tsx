@@ -201,7 +201,7 @@ export default function HotelsListClient({ initialHotels }: HotelsListClientProp
               {/* Hotel image */}
               <div className="relative h-48 md:h-64 lg:h-80 overflow-hidden">
                 <Image
-                  src={hotel.images?.[0] || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80"}
+                  src={hotel.images[0]}
                   alt={hotel.name}
                   fill
                   sizes="(max-width: 768px) 50vw, 50vw"

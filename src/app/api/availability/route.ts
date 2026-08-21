@@ -10,20 +10,13 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Missing checkIn or checkOut parameters" }, { status: 400 });
     }
 
-    const dashboardUrl = process.env.CENTRAL_DASHBOARD_API_URL || "https://booking-system-jet-kappa.vercel.app/api/public/bookings";
+    const dashboardUrl = process.env.CENTRAL_DASHBOARD_API_URL || "https://sri-plus-dashboard.vercel.app/api/public/bookings";
     // Construct the availability URL from the bookings URL
     const availabilityUrl = dashboardUrl.replace("/bookings", "/availability");
 
     console.log(`Proxying availability request to dashboard: ${availabilityUrl}?checkIn=${checkIn}&checkOut=${checkOut}`);
 
-    const apiKey = process.env.CENTRAL_DASHBOARD_API_KEY || "earls_website_secure_token_2026";
-
-    const response = await fetch(`${availabilityUrl}?checkIn=${checkIn}&checkOut=${checkOut}`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
-      },
-    });
+    const response = await fetch(`${availabilityUrl}?checkIn=${checkIn}&checkOut=${checkOut}`);
     
     if (!response.ok) {
       const errorText = await response.text();

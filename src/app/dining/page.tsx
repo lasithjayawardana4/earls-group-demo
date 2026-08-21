@@ -63,7 +63,7 @@ export default async function DiningPage() {
               {/* Photo */}
               <div className="relative w-full lg:w-1/2 h-96 overflow-hidden border border-luxury-gold/15">
                 <Image
-                  src={rest.images?.[0] || "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=800&q=80"}
+                  src={rest.images[0]}
                   alt={rest.name}
                   fill
                   className="object-cover filter brightness-95 hover:scale-105 transition-transform duration-[1.5s]"

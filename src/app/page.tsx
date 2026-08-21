@@ -168,7 +168,7 @@ export default async function Home() {
                 {/* Image */}
                 <div className="relative h-48 md:h-72 lg:h-96 overflow-hidden">
                   <Image
-                    src={hotel.images?.[0] || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80"}
+                    src={hotel.images[0]}
                     alt={hotel.name}
                     fill
                     sizes="(max-width: 768px) 50vw, 33vw"

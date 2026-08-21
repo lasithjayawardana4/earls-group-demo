@@ -48,7 +48,7 @@ export default async function HotelDetailPage({ params }: Props) {
             />
           ) : (
             <Image
-              src={hotel.images?.[0] || "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1600&q=80"}
+              src={hotel.images[0]}
               alt={hotel.name}
               fill
               priority
