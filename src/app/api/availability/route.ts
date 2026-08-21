@@ -16,7 +16,14 @@ export async function GET(req: Request) {
 
     console.log(`Proxying availability request to dashboard: ${availabilityUrl}?checkIn=${checkIn}&checkOut=${checkOut}`);
 
-    const response = await fetch(`${availabilityUrl}?checkIn=${checkIn}&checkOut=${checkOut}`);
+    const apiKey = process.env.CENTRAL_DASHBOARD_API_KEY || "earls_website_secure_token_2026";
+
+    const response = await fetch(`${availabilityUrl}?checkIn=${checkIn}&checkOut=${checkOut}`, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+    });
     
     if (!response.ok) {
       const errorText = await response.text();

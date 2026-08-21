@@ -42,10 +42,15 @@ const pushBookingToDashboard = async (bookingDetails: {
     },
   };
 
+  const apiKey = process.env.CENTRAL_DASHBOARD_API_KEY || "earls_website_secure_token_2026";
+
   try {
     const response = await fetch(dashboardUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
       body: JSON.stringify(payload),
     });
 
